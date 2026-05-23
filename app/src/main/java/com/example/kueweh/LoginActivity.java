@@ -22,8 +22,20 @@ public class LoginActivity extends AppCompatActivity {
 
         // Cek Session: Jika pengguna sudah login sebelumnya, langsung lempar ke MainActivity
         SharedPreferences sharedPref = getSharedPreferences("KueWehSession", MODE_PRIVATE);
+
+        // Jika pengguna sudah login sebelumnya
         if (sharedPref.getBoolean("isLoggedIn", false)) {
-            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+            // Ambil email yang tersimpan di sesi terakhir
+            String savedEmail = sharedPref.getString("userEmail", "");
+
+            if (savedEmail.equals("admin@kueweh.com")) {
+                // Jika yang terakhir login adalah Admin, arahkan ke AdminActivity
+                startActivity(new Intent(LoginActivity.this, AdminActivity.class));
+            } else {
+                // Jika kustomer biasa, arahkan ke MainActivity
+                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+            }
+
             finish();
             return;
         }
