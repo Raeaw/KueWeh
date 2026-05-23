@@ -2,9 +2,11 @@ package com.example.kueweh;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -16,8 +18,7 @@ public class AddProductActivity extends AppCompatActivity {
     private ImageView imgPreview;
     private Button btnPilihFoto, btnSimpan;
     private EditText etNamaKue, etHargaKue;
-
-    // Variabel untuk menyimpan "alamat" foto di memori HP
+    private Spinner spinnerKategori; // Deklarasikan Spinner
     private String selectedImageUri = "";
 
     @Override
@@ -30,48 +31,52 @@ public class AddProductActivity extends AppCompatActivity {
         btnSimpan = findViewById(R.id.btnSimpanProduk);
         etNamaKue = findViewById(R.id.etNamaKue);
         etHargaKue = findViewById(R.id.etHargaKue);
+        spinnerKategori = findViewById(R.id.spinnerKategori); // Inisialisasi
 
-        // Logika modern untuk membuka Galeri HP
+        // 1. BUAT DAFTAR PILIHAN UNTUK SPINNER
+        String[] daftarKategori = {"Cake", "Cookies", "Drink"};
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_dropdown_item, daftarKategori);
+        spinnerKategori.setAdapter(spinnerAdapter);
+
+        // Ambil Foto dari Galeri
         ActivityResultLauncher<String> ambilFotoDariGaleri = registerForActivityResult(
                 new ActivityResultContracts.GetContent(),
                 uri -> {
                     if (uri != null) {
-                        // Simpan alamat URI dalam bentuk String ke variabel
                         selectedImageUri = uri.toString();
-
-                        // Tampilkan foto di layar menggunakan Glide
                         Glide.with(this).load(uri).into(imgPreview);
                     }
                 }
         );
 
-        // Saat tombol "Pilih Foto" ditekan, buka folder gambar (image/*)
         btnPilihFoto.setOnClickListener(v -> ambilFotoDariGaleri.launch("image/*"));
 
-        // Saat tombol "Simpan" ditekan, masukkan ke SQLite
+        // Simpan Produk ke SQLite
         btnSimpan.setOnClickListener(v -> {
-            String nama = etNamaKue.getText().toString();
-            String harga = etHargaKue.getText().toString();
+            String nama = etNamaKue.getText().toString().trim();
+            String harga = etHargaKue.getText().toString().trim();
+
+            // 2. AMBIL KATEGORI YANG DIPILIH OLEH ADMIN
+            String kategoriDipilih = spinnerKategori.getSelectedItem().toString();
 
             if (nama.isEmpty() || harga.isEmpty()) {
                 Toast.makeText(this, "Nama dan harga wajib diisi!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // Jika foto kosong, kita beri nilai default / string kosong
             if (selectedImageUri.isEmpty()) {
-                selectedImageUri = "https://via.placeholder.com/150"; // Gambar darurat
+                selectedImageUri = "https://via.placeholder.com/150";
             }
 
-            // Insert ke database di thread terpisah (atau main thread karena sudah di-allow)
             new Thread(() -> {
-                // Rating dan Ulasan kita beri default 0 untuk produk baru
-                Kue kueBaru = new Kue(nama, harga, "0.0", "(0)", selectedImageUri);
+                // 3. MASUKKAN KATEGORI YANG DIPILIH KE DALAM CONSTRUCTOR KUE
+                Kue kueBaru = new Kue(nama, harga, "0.0", "(0)", selectedImageUri, kategoriDipilih);
                 AppDatabase.getInstance(AddProductActivity.this).kueDao().insertKue(kueBaru);
 
                 runOnUiThread(() -> {
                     Toast.makeText(this, "Produk berhasil ditambahkan!", Toast.LENGTH_SHORT).show();
-                    finish(); // Tutup halaman form ini dan kembali ke Admin Dashboard
+                    finish();
                 });
             }).start();
         });

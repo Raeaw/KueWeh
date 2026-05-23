@@ -54,6 +54,22 @@
             android:hint="Harga (Contoh: Rp 50.000)"
             android:paddingHorizontal="16dp" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Kategori Produk"
+            android:textColor="#1E1C18"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/spinnerKategori"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_input_rounded"
+            android:paddingHorizontal="16dp" />
+
         <Button
             android:id="@+id/btnSimpanProduk"
             android:layout_width="match_parent"

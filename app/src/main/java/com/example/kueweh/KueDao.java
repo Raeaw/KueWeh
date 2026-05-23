@@ -8,11 +8,13 @@ import java.util.List;
 @Dao
 public interface KueDao {
 
-    // Method untuk menambah kue baru ke database
     @Insert
     void insertKue(Kue kue);
 
-    // Method untuk mengambil semua kue dari database
     @Query("SELECT * FROM tabel_kue")
     List<Kue> getAllKue();
+
+    // TAMBAHKAN QUERY FILTER INI
+    @Query("SELECT * FROM tabel_kue WHERE kategori = :kat")
+    List<Kue> getKueByKategori(String kat);
 }
