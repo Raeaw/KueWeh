@@ -22,6 +22,24 @@ public class AdminActivity extends AppCompatActivity {
         rvAdminKue = findViewById(R.id.rvAdminKue);
         fabTambah = findViewById(R.id.fabTambahProduk);
 
+        android.widget.ImageView btnLogoutAdmin = findViewById(R.id.btnLogoutAdmin);
+
+        btnLogoutAdmin.setOnClickListener(v -> {
+            // Hapus data sesi admin dari SQLite / SharedPreferences
+            android.content.SharedPreferences sharedPref = getSharedPreferences("KueWehSession", MODE_PRIVATE);
+            android.content.SharedPreferences.Editor editor = sharedPref.edit();
+            editor.clear();
+            editor.apply();
+
+            android.widget.Toast.makeText(AdminActivity.this, "Berhasil Keluar dari Admin", android.widget.Toast.LENGTH_SHORT).show();
+
+            // Arahkan kembali ke Login dan kunci agar tidak bisa di-back
+            Intent intent = new Intent(AdminActivity.this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        });
+
         // Atur RecyclerView menjadi Grid (sama seperti di Home)
         rvAdminKue.setLayoutManager(new GridLayoutManager(this, 2));
 
