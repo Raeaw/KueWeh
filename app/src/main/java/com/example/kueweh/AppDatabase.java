@@ -5,11 +5,15 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-// Sambungkan dengan Kue.class
-@Database(entities = {Kue.class}, version = 1, exportSchema = false)
+// 1. Tambahkan User.class di sebelah Kue.class
+@Database(entities = {Kue.class, User.class}, version = 1, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract KueDao kueDao();
+
+    // 2. Tambahkan baris ini agar UserDao bisa dipanggil dari Activity!
+    public abstract UserDao userDao();
+
     private static volatile AppDatabase INSTANCE;
 
     public static AppDatabase getInstance(Context context) {
