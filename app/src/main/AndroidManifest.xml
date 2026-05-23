@@ -23,6 +23,8 @@
 
         <activity android:name=".RegisterActivity" android:exported="false" />
         <activity android:name=".MainActivity" android:exported="false" />
+        <activity android:name=".AdminActivity" android:exported="false" />
+        <activity android:name=".AddProductActivity" android:exported="false" />
     </application>
 
 </manifest>

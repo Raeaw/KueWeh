@@ -60,9 +60,17 @@ public class LoginActivity extends AppCompatActivity {
                         editor.putString("userName", user.namaLengkap);
                         editor.apply();
 
+                        // LOGIKA PENGECEKAN ADMIN (OPSI 1)
                         runOnUiThread(() -> {
-                            Toast.makeText(LoginActivity.this, "Selamat Datang Kembali!", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                            Toast.makeText(LoginActivity.this, "Selamat Datang!", Toast.LENGTH_SHORT).show();
+
+                            if (user.email.equals("admin@kueweh.com")) {
+                                // Jika Admin, masuk ke AdminActivity
+                                startActivity(new Intent(LoginActivity.this, AdminActivity.class));
+                            } else {
+                                // Jika Customer biasa, masuk ke MainActivity (Home)
+                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                            }
                             finish();
                         });
                     } else {
