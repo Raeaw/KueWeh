@@ -17,4 +17,7 @@ public interface KueDao {
     // TAMBAHKAN QUERY FILTER INI
     @Query("SELECT * FROM tabel_kue WHERE kategori = :kat")
     List<Kue> getKueByKategori(String kat);
+
+    @Query("SELECT * FROM tabel_kue WHERE nama LIKE '%' || :keyword || '%'")
+    List<Kue> searchKue(String keyword);
 }

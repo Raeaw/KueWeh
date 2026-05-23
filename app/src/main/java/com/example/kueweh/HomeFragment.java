@@ -1,9 +1,12 @@
 package com.example.kueweh;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,6 +20,7 @@ public class HomeFragment extends Fragment {
     private RecyclerView rvKue;
     private KueDao kueDao;
     private TextView tvSemua, tvCake, tvCookies, tvDrink;
+    private EditText etSearch; // Variabel untuk kolom pencarian
 
     @Nullable
     @Override
@@ -30,10 +34,11 @@ public class HomeFragment extends Fragment {
         tvCake = view.findViewById(R.id.tvFilterCake);
         tvCookies = view.findViewById(R.id.tvFilterCookies);
         tvDrink = view.findViewById(R.id.tvFilterDrink);
+        etSearch = view.findViewById(R.id.etSearch); // Inisialisasi Search Bar
 
         kueDao = AppDatabase.getInstance(getContext()).kueDao();
 
-        // Seeding Data Dummy awal (Sudah ditambahkan parameter Kategori di akhir)
+        // (Data dummy seeding tetap sama)
         List<Kue> kueList = kueDao.getAllKue();
         if (kueList.isEmpty()) {
             kueDao.insertKue(new Kue("Chocolate Fudge Cake", "Rp 125.000", "4.8", "(124)", "https://juliemarieeats.com/wp-content/uploads/2023/08/Chocolate-Fudge-Cake-10-scaled.jpg", "Cake"));
@@ -46,24 +51,53 @@ public class HomeFragment extends Fragment {
 
         tampilkanData(kueList);
 
-        // EVENT KLIK FILTER
+        // --- FITUR SEARCH REAL-TIME ---
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String keyword = s.toString();
+
+                // Jika kolom pencarian diisi, lakukan query ke database
+                if (!keyword.isEmpty()) {
+                    ubahWarnaFilter(tvSemua); // Kembalikan filter ke "Semua" secara visual
+                    List<Kue> hasilPencarian = kueDao.searchKue(keyword);
+                    tampilkanData(hasilPencarian);
+                } else {
+                    // Jika kolom pencarian dihapus sampai kosong, tampilkan semua kue lagi
+                    tampilkanData(kueDao.getAllKue());
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) { }
+        });
+        // -------------------------------
+
+        // EVENT KLIK FILTER (Tetap sama)
         tvSemua.setOnClickListener(v -> {
             ubahWarnaFilter(tvSemua);
+            etSearch.setText(""); // Kosongkan search bar saat tombol kategori diklik
             tampilkanData(kueDao.getAllKue());
         });
 
         tvCake.setOnClickListener(v -> {
             ubahWarnaFilter(tvCake);
+            etSearch.setText("");
             tampilkanData(kueDao.getKueByKategori("Cake"));
         });
 
         tvCookies.setOnClickListener(v -> {
             ubahWarnaFilter(tvCookies);
+            etSearch.setText("");
             tampilkanData(kueDao.getKueByKategori("Cookies"));
         });
 
         tvDrink.setOnClickListener(v -> {
             ubahWarnaFilter(tvDrink);
+            etSearch.setText("");
             tampilkanData(kueDao.getKueByKategori("Drink"));
         });
 
@@ -75,16 +109,13 @@ public class HomeFragment extends Fragment {
         rvKue.setAdapter(adapter);
     }
 
-    // Fungsi untuk mengubah style tombol yang sedang aktif secara visual
     private void ubahWarnaFilter(TextView tombolAktif) {
-        // Set semua tombol ke mode tidak aktif dulu
         TextView[] semuaTombol = {tvSemua, tvCake, tvCookies, tvDrink};
         for (TextView tv : semuaTombol) {
             tv.setBackgroundResource(R.drawable.bg_chip_inactive);
             tv.setTextColor(android.graphics.Color.parseColor("#757575"));
             tv.setTypeface(null, android.graphics.Typeface.NORMAL);
         }
-        // Set tombol yang diklik menjadi aktif (Orange)
         tombolAktif.setBackgroundResource(R.drawable.bg_chip_active);
         tombolAktif.setTextColor(android.graphics.Color.WHITE);
         tombolAktif.setTypeface(null, android.graphics.Typeface.BOLD);
