@@ -70,6 +70,14 @@ public class KueAdapter extends RecyclerView.Adapter<KueAdapter.KueViewHolder> {
                 });
                 builder.show();
             });
+        } else {
+            // LOGIKA JIKA DIJALANKAN DI HALAMAN PELANGGAN (HOME)
+            holder.itemView.setOnClickListener(v -> {
+                // Berpindah ke DetailActivity dengan membawa ID Kue
+                Intent intent = new Intent(context, DetailActivity.class);
+                intent.putExtra("KUE_ID", kue.getId());
+                context.startActivity(intent);
+            });
         }
     }
 

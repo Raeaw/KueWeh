@@ -26,6 +26,7 @@
         <activity android:name=".AdminActivity" android:exported="false" />
         <activity android:name=".AddProductActivity" android:exported="false" />
         <activity android:name=".EditProductActivity" android:exported="false" />
+        <activity android:name=".DetailActivity" android:exported="false" />
     </application>
 
 </manifest>

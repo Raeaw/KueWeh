@@ -29,4 +29,7 @@ public interface KueDao {
 
     @Delete
     void deleteKue(Kue kue);
+
+    @Query("SELECT * FROM tabel_kue WHERE id = :kueId LIMIT 1")
+    Kue getKueById(int kueId);
 }
