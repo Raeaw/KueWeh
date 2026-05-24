@@ -1,8 +1,11 @@
 package com.example.kueweh;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Update;
+
 import java.util.List;
 
 @Dao
@@ -20,4 +23,10 @@ public interface KueDao {
 
     @Query("SELECT * FROM tabel_kue WHERE nama LIKE '%' || :keyword || '%'")
     List<Kue> searchKue(String keyword);
+
+    @Update
+    void updateKue(Kue kue);
+
+    @Delete
+    void deleteKue(Kue kue);
 }

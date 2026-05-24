@@ -57,9 +57,9 @@ public class AdminActivity extends AppCompatActivity {
     }
 
     private void loadProduk() {
-        // Ambil data langsung dari SQLite
         List<Kue> daftarKue = AppDatabase.getInstance(this).kueDao().getAllKue();
-        adapter = new KueAdapter(this, daftarKue);
+        // TAMBAHKAN PARAMETER true DI AKHIR AGAR MODE ADMIN AKTIF
+        adapter = new KueAdapter(this, daftarKue, true);
         rvAdminKue.setAdapter(adapter);
     }
 }
