@@ -53,25 +53,34 @@ public class DetailActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> finish()); // Menutup halaman ini dan kembali ke Home
 
         // 5. Aksi Tombol Pesan (Untuk saat ini kita beri efek Toast dulu)
+        btnPesan.setText("Tambah ke Keranjang");
+
         btnPesan.setOnClickListener(v -> {
-            // Ambil email user yang sedang aktif login dari SharedPreferences
             android.content.SharedPreferences sharedPref = getSharedPreferences("KueWehSession", MODE_PRIVATE);
             String currentEmail = sharedPref.getString("userEmail", "");
 
             new Thread(() -> {
-                // Ambil data kue yang sedang ditampilkan saat ini
                 Kue kue = kueDao.getKueById(kueId);
 
                 if (kue != null) {
-                    // Buat objek transaksi pesanan baru
-                    Pesanan pesananBaru = new Pesanan(currentEmail, kue.getNama(), kue.getHarga(), kue.getImageUrl());
+                    KeranjangDao keranjangDao = AppDatabase.getInstance(DetailActivity.this).keranjangDao();
 
-                    // Simpan ke SQLite
-                    AppDatabase.getInstance(DetailActivity.this).pesananDao().insertPesanan(pesananBaru);
+                    // Cek apakah item ini sudah ada di keranjang
+                    Keranjang itemAda = keranjangDao.cekItemKeranjang(currentEmail, kue.getNama());
+
+                    if (itemAda != null) {
+                        // Jika sudah ada, tambahkan kuantitasnya
+                        itemAda.setJumlah(itemAda.getJumlah() + 1);
+                        keranjangDao.updateKeranjang(itemAda);
+                    } else {
+                        // Jika belum ada, masukkan sebagai item baru dengan jumlah 1
+                        Keranjang itemBaru = new Keranjang(currentEmail, kue.getNama(), kue.getHarga(), kue.getImageUrl(), 1);
+                        keranjangDao.insertKeranjang(itemBaru);
+                    }
 
                     runOnUiThread(() -> {
-                        Toast.makeText(DetailActivity.this, "Kue berhasil dipesan! Cek di menu Pesanan.", Toast.LENGTH_LONG).show();
-                        finish(); // Tutup halaman detail dan kembali ke Home
+                        Toast.makeText(DetailActivity.this, "Berhasil masuk ke Keranjang!", Toast.LENGTH_SHORT).show();
+                        finish();
                     });
                 }
             }).start();
