@@ -27,10 +27,11 @@ public class MainActivity extends AppCompatActivity {
 
             if (item.getItemId() == R.id.nav_home) {
                 selectedFragment = new HomeFragment();
+            } else if (item.getItemId() == R.id.nav_pesanan) {
+                selectedFragment = new PesananFragment();
             } else if (item.getItemId() == R.id.nav_profile) {
                 selectedFragment = new ProfileFragment();
             }
-            // (Nanti kamu bisa tambah nav_favorite dan nav_pesanan di sini)
 
             if (selectedFragment != null) {
                 getSupportFragmentManager().beginTransaction()

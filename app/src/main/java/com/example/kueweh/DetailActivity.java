@@ -54,7 +54,27 @@ public class DetailActivity extends AppCompatActivity {
 
         // 5. Aksi Tombol Pesan (Untuk saat ini kita beri efek Toast dulu)
         btnPesan.setOnClickListener(v -> {
-            Toast.makeText(DetailActivity.this, "Fitur keranjang akan segera hadir!", Toast.LENGTH_SHORT).show();
+            // Ambil email user yang sedang aktif login dari SharedPreferences
+            android.content.SharedPreferences sharedPref = getSharedPreferences("KueWehSession", MODE_PRIVATE);
+            String currentEmail = sharedPref.getString("userEmail", "");
+
+            new Thread(() -> {
+                // Ambil data kue yang sedang ditampilkan saat ini
+                Kue kue = kueDao.getKueById(kueId);
+
+                if (kue != null) {
+                    // Buat objek transaksi pesanan baru
+                    Pesanan pesananBaru = new Pesanan(currentEmail, kue.getNama(), kue.getHarga(), kue.getImageUrl());
+
+                    // Simpan ke SQLite
+                    AppDatabase.getInstance(DetailActivity.this).pesananDao().insertPesanan(pesananBaru);
+
+                    runOnUiThread(() -> {
+                        Toast.makeText(DetailActivity.this, "Kue berhasil dipesan! Cek di menu Pesanan.", Toast.LENGTH_LONG).show();
+                        finish(); // Tutup halaman detail dan kembali ke Home
+                    });
+                }
+            }).start();
         });
     }
 }
