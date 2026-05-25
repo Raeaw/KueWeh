@@ -113,23 +113,25 @@ public class BatchAdapter extends RecyclerView.Adapter<BatchAdapter.BatchViewHol
                     float ratingBaru = which + 1;
 
                     new Thread(() -> {
-                        // Update rating di tabel_pesanan SQLite
+                        // 1. Update rating di tabel_pesanan (Riwayat)
                         item.setRating(ratingBaru);
                         AppDatabase.getInstance(context).pesananDao().updatePesanan(item);
 
-                        // (Opsional) Update rating di tabel_kue utama jika KueDao memiliki metode getKueByName
+                        // 2. Update rating di tabel_kue (Beranda Utama)
                         KueDao kueDao = AppDatabase.getInstance(context).kueDao();
-                        Kue kue = kueDao.getKueByName(item.getNamaKue());
-                        if (kue != null) {
-                            kue.setRating(String.valueOf(ratingBaru));
-                            kueDao.updateKue(kue);
+                        Kue kueKatalog = kueDao.getKueByName(item.getNamaKue()); // Mencari kue yang cocok
+
+                        if (kueKatalog != null) {
+                            // Ubah format rating menjadi desimal (contoh: 5.0)
+                            kueKatalog.setRating(String.format(Locale.US, "%.1f", ratingBaru));
+                            // Ubah teks ulasan sebagai penanda
+                            kueKatalog.setUlasan("(Diulas)");
+                            kueDao.updateKue(kueKatalog); // Simpan perubahan ke database
                         }
 
-                        // Berpindah kembali ke Main Thread untuk memperbarui UI
                         if (context instanceof Activity) {
                             ((Activity) context).runOnUiThread(() -> {
                                 Toast.makeText(context, "Terima kasih atas ratingnya!", Toast.LENGTH_SHORT).show();
-                                // Refresh activity agar kalkulasi rating rata-rata langsung muncul
                                 ((Activity) context).recreate();
                             });
                         }

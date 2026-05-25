@@ -33,5 +33,6 @@ public interface KueDao {
     @Query("SELECT * FROM tabel_kue WHERE id = :kueId LIMIT 1")
     Kue getKueById(int kueId);
 
-    @Query("SELECT * FROM tabel_kue WHERE nama = :nama LIMIT 1") Kue getKueByName(String nama);
+    @Query("SELECT * FROM tabel_kue WHERE nama = :namaKue LIMIT 1")
+    Kue getKueByName(String namaKue);
 }
