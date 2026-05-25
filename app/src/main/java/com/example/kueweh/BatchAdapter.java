@@ -113,20 +113,20 @@ public class BatchAdapter extends RecyclerView.Adapter<BatchAdapter.BatchViewHol
                     float ratingBaru = which + 1;
 
                     new Thread(() -> {
-                        // 1. Update rating di tabel_pesanan (Riwayat)
+                        // 1. Simpan rating baru ke transaksi ini
                         item.setRating(ratingBaru);
-                        AppDatabase.getInstance(context).pesananDao().updatePesanan(item);
+                        PesananDao pesananDao = AppDatabase.getInstance(context).pesananDao();
+                        pesananDao.updatePesanan(item);
 
-                        // 2. Update rating di tabel_kue (Beranda Utama)
+                        // 2. Minta SQLite menghitung rata-rata KESELURUHAN kue ini
+                        float rataRataGlobal = pesananDao.getAverageRatingKue(item.getNamaKue());
+
+                        // 3. Update rating di halaman Home/Katalog dengan nilai rata-rata tersebut
                         KueDao kueDao = AppDatabase.getInstance(context).kueDao();
-                        Kue kueKatalog = kueDao.getKueByName(item.getNamaKue()); // Mencari kue yang cocok
-
+                        Kue kueKatalog = kueDao.getKueByName(item.getNamaKue());
                         if (kueKatalog != null) {
-                            // Ubah format rating menjadi desimal (contoh: 5.0)
-                            kueKatalog.setRating(String.format(Locale.US, "%.1f", ratingBaru));
-                            // Ubah teks ulasan sebagai penanda
-                            kueKatalog.setUlasan("(Diulas)");
-                            kueDao.updateKue(kueKatalog); // Simpan perubahan ke database
+                            kueKatalog.setRating(String.format(Locale.US, "%.1f", rataRataGlobal));
+                            kueDao.updateKue(kueKatalog);
                         }
 
                         if (context instanceof Activity) {

@@ -19,4 +19,8 @@ public interface PesananDao {
 
     @Update
     void updatePesanan(Pesanan pesanan);
+
+    // Mengambil rata-rata rating sebuah kue (hanya yang sudah diberi rating > 0)
+    @Query("SELECT AVG(rating) FROM tabel_pesanan WHERE namaKue = :nama AND rating > 0")
+    float getAverageRatingKue(String nama);
 }
