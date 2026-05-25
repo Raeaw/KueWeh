@@ -32,4 +32,8 @@ public interface PesananDao {
     // 3. Menghitung rata-rata rating khusus milik user yang sedang login
     @Query("SELECT COALESCE(AVG(rating), 0.0) FROM tabel_pesanan WHERE namaKue = :nama AND userEmail = :email AND rating > 0")
     float getPersonalAverageRating(String nama, String email);
+
+    // Menghitung berapa kali user ini sudah memesan item tersebut
+    @Query("SELECT COUNT(*) FROM tabel_pesanan WHERE namaKue = :nama AND userEmail = :email")
+    int getOrderCountPerUser(String nama, String email);
 }

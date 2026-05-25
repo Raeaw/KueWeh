@@ -63,12 +63,11 @@
                     android:id="@+id/tvPersonalRating"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Rating Anda: Belum ada"
+                    android:layout_marginTop="6dp"
+                    android:text="Rating Anda: ⭐ 0.0 (0x beli)"
                     android:textColor="#F5A67B"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:visibility="visible" />
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
 
                 <View
                     android:layout_width="match_parent"
