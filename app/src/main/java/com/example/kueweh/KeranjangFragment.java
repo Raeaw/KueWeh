@@ -53,13 +53,16 @@ public class KeranjangFragment extends Fragment implements KeranjangAdapter.Kera
             }
 
             new Thread(() -> {
+                long batchTimestamp = System.currentTimeMillis();
+
                 for (Keranjang item : keranjangList) {
+
                     int hargaSatuan = Integer.parseInt(item.getHargaKue().replaceAll("[^0-9]", ""));
                     int totalPerItem = hargaSatuan * item.getJumlah();
 
                     String hargaFinal = "Rp " + NumberFormat.getNumberInstance(new Locale("id", "ID")).format(totalPerItem) + " (" + item.getJumlah() + "x)";
 
-                    Pesanan pesanan = new Pesanan(currentEmail, item.getNamaKue(), hargaFinal, item.getImageUrl());
+                    Pesanan pesanan = new Pesanan(currentEmail, item.getNamaKue(), hargaFinal, item.getImageUrl(), batchTimestamp);
                     db.pesananDao().insertPesanan(pesanan);
                 }
 

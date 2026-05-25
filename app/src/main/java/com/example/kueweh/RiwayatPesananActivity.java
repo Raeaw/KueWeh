@@ -9,14 +9,21 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+// Jangan lupa import untuk List, ArrayList, Map, dan LinkedHashMap
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RiwayatPesananActivity extends AppCompatActivity {
 
     private RecyclerView rvRiwayat;
     private TextView tvKosong;
     private ImageView btnBack;
-    private PesananAdapter adapter;
+
+    // UBAH: Gunakan BatchAdapter, bukan PesananAdapter
+    private BatchAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,18 +43,38 @@ public class RiwayatPesananActivity extends AppCompatActivity {
         SharedPreferences sharedPref = getSharedPreferences("KueWehSession", Context.MODE_PRIVATE);
         String currentEmail = sharedPref.getString("userEmail", "");
 
-        // Ambil data riwayat pesanan dari SQLite
-        List<Pesanan> riwayatList = AppDatabase.getInstance(this).pesananDao().getPesananByUser(currentEmail);
+        // Ambil SEMUA data riwayat pesanan dari SQLite (bentuknya masih rata/flat)
+        List<Pesanan> allPesanan = AppDatabase.getInstance(this).pesananDao().getPesananByUser(currentEmail);
 
-        // Tampilkan data ke RecyclerView atau tampilkan teks "Kosong"
-        if (riwayatList.isEmpty()) {
+        // Cek apakah kosong
+        if (allPesanan.isEmpty()) {
             rvRiwayat.setVisibility(View.GONE);
             tvKosong.setVisibility(View.VISIBLE);
         } else {
             rvRiwayat.setVisibility(View.VISIBLE);
             tvKosong.setVisibility(View.GONE);
 
-            adapter = new PesananAdapter(this, riwayatList);
+            // --- LOGIKA GROUPING BERDASARKAN BATCH (TIMESTAMP) ---
+
+            // 1. Kelompokkan item yang memiliki timestamp sama ke dalam Map
+            Map<Long, List<Pesanan>> groupedMap = new LinkedHashMap<>();
+            for (Pesanan p : allPesanan) {
+                if (!groupedMap.containsKey(p.getTimestamp())) {
+                    groupedMap.put(p.getTimestamp(), new ArrayList<>());
+                }
+                groupedMap.get(p.getTimestamp()).add(p);
+            }
+
+            // 2. Ubah Map tersebut menjadi List<BatchPesanan> agar bisa dibaca oleh RecyclerView
+            List<BatchPesanan> batchList = new ArrayList<>();
+            for (Map.Entry<Long, List<Pesanan>> entry : groupedMap.entrySet()) {
+                batchList.add(new BatchPesanan(entry.getKey(), entry.getValue()));
+            }
+
+            // -----------------------------------------------------
+
+            // 3. Masukkan data yang sudah berkelompok ke BatchAdapter
+            adapter = new BatchAdapter(this, batchList);
             rvRiwayat.setAdapter(adapter);
         }
     }
