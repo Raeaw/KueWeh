@@ -118,14 +118,17 @@ public class BatchAdapter extends RecyclerView.Adapter<BatchAdapter.BatchViewHol
                         PesananDao pesananDao = AppDatabase.getInstance(context).pesananDao();
                         pesananDao.updatePesanan(item);
 
-                        // 2. Minta SQLite menghitung rata-rata KESELURUHAN kue ini
-                        float rataRataGlobal = pesananDao.getAverageRatingKue(item.getNamaKue());
+                        // 2. Ambil nilai rata-rata sejati dan jumlah akun pengulas
+                        float trueGlobalAvg = pesananDao.getTrueGlobalAverageRating(item.getNamaKue());
+                        int reviewerCount = pesananDao.getReviewerCount(item.getNamaKue());
 
-                        // 3. Update rating di halaman Home/Katalog dengan nilai rata-rata tersebut
+                        // 3. Update database tabel_kue agar Home menampilkan angka global
                         KueDao kueDao = AppDatabase.getInstance(context).kueDao();
                         Kue kueKatalog = kueDao.getKueByName(item.getNamaKue());
                         if (kueKatalog != null) {
-                            kueKatalog.setRating(String.format(Locale.US, "%.1f", rataRataGlobal));
+                            kueKatalog.setRating(String.format(Locale.US, "%.1f", trueGlobalAvg));
+                            // Format ulasan kembali menjadi angka, contoh: (12)
+                            kueKatalog.setUlasan("(" + reviewerCount + ")");
                             kueDao.updateKue(kueKatalog);
                         }
 

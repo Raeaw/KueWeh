@@ -21,6 +21,15 @@ public interface PesananDao {
     void updatePesanan(Pesanan pesanan);
 
     // Mengambil rata-rata rating sebuah kue (hanya yang sudah diberi rating > 0)
-    @Query("SELECT AVG(rating) FROM tabel_pesanan WHERE namaKue = :nama AND rating > 0")
-    float getAverageRatingKue(String nama);
+// 1. Menghitung rata-rata rating Global (Tiap akun dihitung 1 suara rata-rata)
+    @Query("SELECT COALESCE(AVG(userAvg), 0.0) FROM (SELECT AVG(rating) AS userAvg FROM tabel_pesanan WHERE namaKue = :nama AND rating > 0 GROUP BY userEmail)")
+    float getTrueGlobalAverageRating(String nama);
+
+    // 2. Menghitung jumlah akun unik yang memberikan rating
+    @Query("SELECT COUNT(DISTINCT userEmail) FROM tabel_pesanan WHERE namaKue = :nama AND rating > 0")
+    int getReviewerCount(String nama);
+
+    // 3. Menghitung rata-rata rating khusus milik user yang sedang login
+    @Query("SELECT COALESCE(AVG(rating), 0.0) FROM tabel_pesanan WHERE namaKue = :nama AND userEmail = :email AND rating > 0")
+    float getPersonalAverageRating(String nama, String email);
 }

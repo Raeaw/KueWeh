@@ -1,5 +1,6 @@
 package com.example.kueweh;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -7,11 +8,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.bumptech.glide.Glide;
+import java.util.Locale;
 
 public class DetailActivity extends AppCompatActivity {
 
     private ImageView imgKue, btnBack;
-    private TextView tvNama, tvKategori, tvRating, tvHarga;
+
+    private TextView tvNama, tvKategori, tvRating, tvHarga, tvPersonalRating;
     private Button btnPesan;
     private KueDao kueDao;
 
@@ -28,37 +31,53 @@ public class DetailActivity extends AppCompatActivity {
         tvHarga = findViewById(R.id.tvDetailHarga);
         btnPesan = findViewById(R.id.btnPesanSekarang);
 
+        // TAMBAHAN: Hubungkan ke layout XML
+        tvPersonalRating = findViewById(R.id.tvPersonalRating);
+
         kueDao = AppDatabase.getInstance(this).kueDao();
 
-        // 1. Ambil ID yang dikirim dari HomeFragment
+        // 1. Ambil email user aktif untuk mencari rating personalnya dan transaksi keranjang
+        SharedPreferences sharedPref = getSharedPreferences("KueWehSession", MODE_PRIVATE);
+        String currentEmail = sharedPref.getString("userEmail", "");
+
+        // 2. Ambil ID yang dikirim dari HomeFragment
         int kueId = getIntent().getIntExtra("KUE_ID", -1);
 
-        // 2. Ambil data spesifik dari Database SQLite
+        // 3. Ambil data spesifik dari Database SQLite
         new Thread(() -> {
             Kue kue = kueDao.getKueById(kueId);
 
             if (kue != null) {
+                // Minta SQLite menghitung rata-rata rating personal dari user ini untuk kue ini
+                float personalAvg = AppDatabase.getInstance(this).pesananDao().getPersonalAverageRating(kue.getNama(), currentEmail);
+
                 runOnUiThread(() -> {
-                    // 3. Masukkan data ke komponen UI
+                    // Masukkan data ke komponen UI
                     tvNama.setText(kue.getNama());
                     tvHarga.setText(kue.getHarga());
                     tvKategori.setText(kue.getKategori());
+
+                    // Menampilkan Rating Global + Jumlah Ulasan
                     tvRating.setText("⭐ " + kue.getRating() + " " + kue.getUlasan());
                     Glide.with(DetailActivity.this).load(kue.getImageUrl()).into(imgKue);
+
+                    // Menampilkan Rating Personal
+                    if (personalAvg > 0) {
+                        tvPersonalRating.setText(String.format(Locale.US, "Rating Anda: ⭐ %.1f", personalAvg));
+                    } else {
+                        tvPersonalRating.setText("Rating Anda: Belum memberikan ulasan");
+                    }
                 });
             }
         }).start();
 
         // 4. Aksi Tombol Kembali (Back)
-        btnBack.setOnClickListener(v -> finish()); // Menutup halaman ini dan kembali ke Home
+        btnBack.setOnClickListener(v -> finish());
 
-        // 5. Aksi Tombol Pesan (Untuk saat ini kita beri efek Toast dulu)
+        // 5. Aksi Tombol Pesan (Keranjang)
         btnPesan.setText("Tambah ke Keranjang");
 
         btnPesan.setOnClickListener(v -> {
-            android.content.SharedPreferences sharedPref = getSharedPreferences("KueWehSession", MODE_PRIVATE);
-            String currentEmail = sharedPref.getString("userEmail", "");
-
             new Thread(() -> {
                 Kue kue = kueDao.getKueById(kueId);
 
