@@ -36,4 +36,8 @@ public interface PesananDao {
     // Menghitung berapa kali user ini sudah memesan item tersebut
     @Query("SELECT COUNT(*) FROM tabel_pesanan WHERE namaKue = :nama AND userEmail = :email")
     int getOrderCountPerUser(String nama, String email);
+
+    // Mengambil SEMUA data pesanan untuk dipantau oleh Admin (diurutkan dari yang terbaru)
+    @Query("SELECT * FROM tabel_pesanan ORDER BY timestamp DESC")
+    List<Pesanan> getAllPesananForAdmin();
 }
