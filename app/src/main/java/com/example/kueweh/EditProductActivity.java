@@ -39,18 +39,20 @@ public class EditProductActivity extends AppCompatActivity {
 
         kueDao = AppDatabase.getInstance(this).kueDao();
 
-        // 1. Setup Dropdown Spinner Kategori
+        // Panggil Formatter Otomatis untuk Harga
+        setupRupiahFormatter(etHargaKue);
+
+        // Setup Dropdown Spinner Kategori
         String[] daftarKategori = {"Cake", "Cookies", "Drink"};
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item, daftarKategori);
         spinnerKategori.setAdapter(spinnerAdapter);
 
-        // 2. Tangkap ID Kue yang dikirim dari Adapter
+        // Tangkap ID Kue yang dikirim dari Adapter
         kueId = getIntent().getIntExtra("KUE_ID", -1);
 
-        // 3. Ambil data lama dari SQLite dan tampilkan di form
+        // Ambil data lama dari SQLite dan tampilkan di form
         new Thread(() -> {
-            // Kita cari object Kue yang memiliki ID cocok
             List<Kue> semuaKue = kueDao.getAllKue();
             for (Kue k : semuaKue) {
                 if (k.getId() == kueId) {
@@ -66,14 +68,13 @@ public class EditProductActivity extends AppCompatActivity {
                     selectedImageUri = kueDataLama.getImageUrl();
                     Glide.with(this).load(selectedImageUri).into(imgPreview);
 
-                    // Set Spinner agar otomatis memilih kategori lama
                     int spinnerPosition = spinnerAdapter.getPosition(kueDataLama.getKategori());
                     spinnerKategori.setSelection(spinnerPosition);
                 });
             }
         }).start();
 
-        // Ambil Foto Baru dari Galeri (Opsional)
+        // Ambil Foto Baru dari Galeri
         ActivityResultLauncher<String> ambilFotoDariGaleri = registerForActivityResult(
                 new ActivityResultContracts.GetContent(),
                 uri -> {
@@ -85,32 +86,77 @@ public class EditProductActivity extends AppCompatActivity {
         );
         btnPilihFoto.setOnClickListener(v -> ambilFotoDariGaleri.launch("image/*"));
 
-        // 4. Proses Simpan Perubahan (Update)
+        // Proses Simpan Perubahan (Update)
         btnSimpan.setOnClickListener(v -> {
             String namaBaru = etNamaKue.getText().toString().trim();
             String hargaBaru = etHargaKue.getText().toString().trim();
             String kategoriBaru = spinnerKategori.getSelectedItem().toString();
 
-            if (namaBaru.isEmpty() || hargaBaru.isEmpty()) {
-                Toast.makeText(this, "Semua kolom wajib diisi!", Toast.LENGTH_SHORT).show();
+            if (namaBaru.isEmpty()) {
+                Toast.makeText(this, "Nama produk wajib diisi!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
+            // Validasi Harga dengan Pop-Up
+            String rawHarga = hargaBaru.replaceAll("[^0-9]", "");
+            if (rawHarga.isEmpty()) {
+                new android.app.AlertDialog.Builder(this)
+                        .setTitle("Harga Tidak Valid ⚠️")
+                        .setMessage("Kolom harga tidak boleh kosong atau berisi huruf. Silakan masukkan angka harga dengan benar.")
+                        .setPositiveButton("Perbaiki", (dialog, which) -> {
+                            etHargaKue.requestFocus();
+                        })
+                        .show();
+                return; // Hentikan proses simpan
+            }
+
             new Thread(() -> {
-                // Update value objek data lama dengan data baru dari form
                 kueDataLama.setNama(namaBaru);
                 kueDataLama.setHarga(hargaBaru);
                 kueDataLama.setKategori(kategoriBaru);
                 kueDataLama.setImageUrl(selectedImageUri);
 
-                // Eksekusi Update ke SQLite Room
                 kueDao.updateKue(kueDataLama);
 
                 runOnUiThread(() -> {
                     Toast.makeText(this, "Perubahan berhasil disimpan!", Toast.LENGTH_SHORT).show();
-                    finish(); // Kembali ke Dashboard Admin
+                    finish();
                 });
             }).start();
+        });
+    }
+
+    // Fungsi TextWatcher untuk format Rupiah
+    private void setupRupiahFormatter(android.widget.EditText editText) {
+        editText.addTextChangedListener(new android.text.TextWatcher() {
+            private String current = "";
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(android.text.Editable s) {
+                if (!s.toString().equals(current)) {
+                    editText.removeTextChangedListener(this);
+
+                    String cleanString = s.toString().replaceAll("[^0-9]", "");
+
+                    if (!cleanString.isEmpty()) {
+                        double parsed = Double.parseDouble(cleanString);
+                        String formatted = java.text.NumberFormat.getNumberInstance(new java.util.Locale("id", "ID")).format(parsed);
+                        current = "Rp " + formatted;
+                    } else {
+                        current = "";
+                    }
+
+                    editText.setText(current);
+                    editText.setSelection(current.length());
+                    editText.addTextChangedListener(this);
+                }
+            }
         });
     }
 }

@@ -18,7 +18,7 @@ public class AddProductActivity extends AppCompatActivity {
     private ImageView imgPreview;
     private Button btnPilihFoto, btnSimpan;
     private EditText etNamaKue, etHargaKue;
-    private Spinner spinnerKategori; // Deklarasikan Spinner
+    private Spinner spinnerKategori;
     private String selectedImageUri = "";
 
     @Override
@@ -31,9 +31,12 @@ public class AddProductActivity extends AppCompatActivity {
         btnSimpan = findViewById(R.id.btnSimpanProduk);
         etNamaKue = findViewById(R.id.etNamaKue);
         etHargaKue = findViewById(R.id.etHargaKue);
-        spinnerKategori = findViewById(R.id.spinnerKategori); // Inisialisasi
+        spinnerKategori = findViewById(R.id.spinnerKategori);
 
-        // 1. BUAT DAFTAR PILIHAN UNTUK SPINNER
+        // Panggil Formatter Otomatis untuk Harga
+        setupRupiahFormatter(etHargaKue);
+
+        // Buat Daftar Pilihan untuk Spinner
         String[] daftarKategori = {"Cake", "Cookies", "Drink"};
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item, daftarKategori);
@@ -56,13 +59,24 @@ public class AddProductActivity extends AppCompatActivity {
         btnSimpan.setOnClickListener(v -> {
             String nama = etNamaKue.getText().toString().trim();
             String harga = etHargaKue.getText().toString().trim();
-
-            // 2. AMBIL KATEGORI YANG DIPILIH OLEH ADMIN
             String kategoriDipilih = spinnerKategori.getSelectedItem().toString();
 
-            if (nama.isEmpty() || harga.isEmpty()) {
-                Toast.makeText(this, "Nama dan harga wajib diisi!", Toast.LENGTH_SHORT).show();
+            if (nama.isEmpty()) {
+                Toast.makeText(this, "Nama produk wajib diisi!", Toast.LENGTH_SHORT).show();
                 return;
+            }
+
+            // Validasi Harga dengan Pop-Up
+            String rawHarga = harga.replaceAll("[^0-9]", "");
+            if (rawHarga.isEmpty()) {
+                new android.app.AlertDialog.Builder(this)
+                        .setTitle("Harga Tidak Valid ⚠️")
+                        .setMessage("Kolom harga tidak boleh kosong atau berisi huruf. Silakan masukkan angka harga dengan benar.")
+                        .setPositiveButton("Perbaiki", (dialog, which) -> {
+                            etHargaKue.requestFocus();
+                        })
+                        .show();
+                return; // Hentikan proses simpan
             }
 
             if (selectedImageUri.isEmpty()) {
@@ -70,7 +84,7 @@ public class AddProductActivity extends AppCompatActivity {
             }
 
             new Thread(() -> {
-                // 3. MASUKKAN KATEGORI YANG DIPILIH KE DALAM CONSTRUCTOR KUE
+                // Harga yang masuk ke database sudah berwujud "Rp XX.XXX"
                 Kue kueBaru = new Kue(nama, harga, "0.0", "(0)", selectedImageUri, kategoriDipilih);
                 AppDatabase.getInstance(AddProductActivity.this).kueDao().insertKue(kueBaru);
 
@@ -79,6 +93,40 @@ public class AddProductActivity extends AppCompatActivity {
                     finish();
                 });
             }).start();
+        });
+    }
+
+    // Fungsi TextWatcher untuk format Rupiah
+    private void setupRupiahFormatter(android.widget.EditText editText) {
+        editText.addTextChangedListener(new android.text.TextWatcher() {
+            private String current = "";
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(android.text.Editable s) {
+                if (!s.toString().equals(current)) {
+                    editText.removeTextChangedListener(this);
+
+                    String cleanString = s.toString().replaceAll("[^0-9]", "");
+
+                    if (!cleanString.isEmpty()) {
+                        double parsed = Double.parseDouble(cleanString);
+                        String formatted = java.text.NumberFormat.getNumberInstance(new java.util.Locale("id", "ID")).format(parsed);
+                        current = "Rp " + formatted;
+                    } else {
+                        current = "";
+                    }
+
+                    editText.setText(current);
+                    editText.setSelection(current.length());
+                    editText.addTextChangedListener(this);
+                }
+            }
         });
     }
 }
