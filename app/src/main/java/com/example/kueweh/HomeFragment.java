@@ -20,7 +20,10 @@ public class HomeFragment extends Fragment {
     private RecyclerView rvKue;
     private KueDao kueDao;
     private TextView tvSemua, tvCake, tvCookies, tvDrink;
-    private EditText etSearch; // Variabel untuk kolom pencarian
+    private EditText etSearch;
+
+    // PERBAIKAN 1: Jadikan KueAdapter sebagai variabel global agar bisa diakses oleh onResume
+    private KueAdapter adapter;
 
     @Nullable
     @Override
@@ -34,11 +37,10 @@ public class HomeFragment extends Fragment {
         tvCake = view.findViewById(R.id.tvFilterCake);
         tvCookies = view.findViewById(R.id.tvFilterCookies);
         tvDrink = view.findViewById(R.id.tvFilterDrink);
-        etSearch = view.findViewById(R.id.etSearch); // Inisialisasi Search Bar
+        etSearch = view.findViewById(R.id.etSearch);
 
         kueDao = AppDatabase.getInstance(getContext()).kueDao();
 
-        // (Data dummy seeding tetap sama)
         List<Kue> kueList = kueDao.getAllKue();
         if (kueList.isEmpty()) {
             kueDao.insertKue(new Kue("Chocolate Fudge Cake", "Rp 125.000", "4.8", "(124)", "https://juliemarieeats.com/wp-content/uploads/2023/08/Chocolate-Fudge-Cake-10-scaled.jpg", "Cake"));
@@ -60,13 +62,11 @@ public class HomeFragment extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String keyword = s.toString();
 
-                // Jika kolom pencarian diisi, lakukan query ke database
                 if (!keyword.isEmpty()) {
-                    ubahWarnaFilter(tvSemua); // Kembalikan filter ke "Semua" secara visual
+                    ubahWarnaFilter(tvSemua);
                     List<Kue> hasilPencarian = kueDao.searchKue(keyword);
                     tampilkanData(hasilPencarian);
                 } else {
-                    // Jika kolom pencarian dihapus sampai kosong, tampilkan semua kue lagi
                     tampilkanData(kueDao.getAllKue());
                 }
             }
@@ -74,12 +74,11 @@ public class HomeFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) { }
         });
-        // -------------------------------
 
-        // EVENT KLIK FILTER (Tetap sama)
+        // EVENT KLIK FILTER
         tvSemua.setOnClickListener(v -> {
             ubahWarnaFilter(tvSemua);
-            etSearch.setText(""); // Kosongkan search bar saat tombol kategori diklik
+            etSearch.setText("");
             tampilkanData(kueDao.getAllKue());
         });
 
@@ -105,7 +104,8 @@ public class HomeFragment extends Fragment {
     }
 
     private void tampilkanData(List<Kue> list) {
-        KueAdapter adapter = new KueAdapter(getContext(), list);
+        // PERBAIKAN 2: Gunakan variabel global 'adapter', jangan buat variabel lokal baru
+        adapter = new KueAdapter(getContext(), list);
         rvKue.setAdapter(adapter);
     }
 
@@ -119,5 +119,14 @@ public class HomeFragment extends Fragment {
         tombolAktif.setBackgroundResource(R.drawable.bg_chip_active);
         tombolAktif.setTextColor(android.graphics.Color.WHITE);
         tombolAktif.setTypeface(null, android.graphics.Typeface.BOLD);
+    }
+
+    // PERBAIKAN 3: Tambahkan onResume untuk merefresh layar saat kembali dari halaman detail
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (adapter != null) {
+            adapter.notifyDataSetChanged(); // Akan menggambar ulang UI dan mengecek status favorit terbaru
+        }
     }
 }
