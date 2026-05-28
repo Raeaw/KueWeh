@@ -5,7 +5,7 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-@Database(entities = {Kue.class, User.class, Pesanan.class, Keranjang.class}, version = 2, exportSchema = false)
+@Database(entities = {Kue.class, User.class, Pesanan.class, Keranjang.class, Favorit.class}, version = 2, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract KueDao kueDao();
@@ -13,6 +13,8 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract UserDao userDao();
     public abstract PesananDao pesananDao();
     public abstract KeranjangDao keranjangDao();
+
+    public abstract FavoritDao favoritDao();
 
     private static volatile AppDatabase INSTANCE;
 
