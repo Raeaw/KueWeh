@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#F9F9F9">
 
     <ScrollView
@@ -150,5 +151,24 @@
         android:background="@drawable/bg_search_rounded"
         android:padding="8dp"
         android:src="@android:drawable/ic_menu_revert" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/btnDetailFavoriteLayout"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="16dp"
+        app:cardBackgroundColor="#FFFFFF"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="4dp">
+
+        <ImageView
+            android:id="@+id/imgDetailFavoriteHeart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="10dp"
+            android:src="@drawable/ic_favorite"
+            app:tint="#BDBDBD" />
+    </androidx.cardview.widget.CardView>
 
 </RelativeLayout>
