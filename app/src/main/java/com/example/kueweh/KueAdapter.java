@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import java.util.List;
@@ -18,15 +19,13 @@ public class KueAdapter extends RecyclerView.Adapter<KueAdapter.KueViewHolder> {
 
     private Context context;
     private List<Kue> kueList;
-    private boolean isAdmin = false; // Default-nya false (untuk kustomer)
+    private boolean isAdmin = false;
 
-    // Constructor 1: Untuk Kustomer biasa (di HomeFragment)
     public KueAdapter(Context context, List<Kue> kueList) {
         this.context = context;
         this.kueList = kueList;
     }
 
-    // Constructor 2: Untuk Admin (di AdminActivity)
     public KueAdapter(Context context, List<Kue> kueList, boolean isAdmin) {
         this.context = context;
         this.kueList = kueList;
@@ -45,39 +44,69 @@ public class KueAdapter extends RecyclerView.Adapter<KueAdapter.KueViewHolder> {
         Kue kue = kueList.get(position);
         holder.tvNama.setText(kue.getNama());
         holder.tvHarga.setText(kue.getHarga());
-
-        // Gabungkan teks rating dan ulasan ke dalam satu TextView
         holder.tvRating.setText("⭐ " + kue.getRating() + " " + kue.getUlasan());
 
         Glide.with(context).load(kue.getImageUrl()).into(holder.imgKue);
 
-        // LOGIKA KHUSUS JIKA DIJALANKAN DI HALAMAN ADMIN
         if (isAdmin) {
+            holder.btnFavoriteLayout.setVisibility(View.GONE);
             holder.itemView.setOnClickListener(v -> {
                 CharSequence[] options = new CharSequence[]{"Edit Produk", "Hapus Produk"};
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle("Pilih Aksi untuk " + kue.getNama());
                 builder.setItems(options, (dialog, which) -> {
                     if (which == 0) {
-                        // 1. OPSI EDIT: Pindah ke EditProductActivity membawa ID Kue
                         Intent intent = new Intent(context, EditProductActivity.class);
                         intent.putExtra("KUE_ID", kue.getId());
                         context.startActivity(intent);
                     } else {
-                        // 2. OPSI HAPUS: Munculkan konfirmasi hapus
                         tampilkanKonfirmasiHapus(kue, position);
                     }
                 });
                 builder.show();
             });
         } else {
-            // LOGIKA JIKA DIJALANKAN DI HALAMAN PELANGGAN (HOME)
             holder.itemView.setOnClickListener(v -> {
-                // Berpindah ke DetailActivity dengan membawa ID Kue
                 Intent intent = new Intent(context, DetailActivity.class);
                 intent.putExtra("KUE_ID", kue.getId());
                 context.startActivity(intent);
             });
+
+            holder.btnFavoriteLayout.setVisibility(View.VISIBLE);
+
+            android.content.SharedPreferences sharedPref = context.getSharedPreferences("KueWehSession", Context.MODE_PRIVATE);
+            String currentEmail = sharedPref.getString("userEmail", "");
+
+            FavoritDao favDao = AppDatabase.getInstance(context).favoritDao();
+
+            // 1. Cek status favorit di background
+            new Thread(() -> {
+                Favorit isFav = favDao.cekFavorit(currentEmail, kue.getNama());
+                boolean isFavorited = (isFav != null);
+
+                // 2. Kembalikan ke UI Thread untuk mengubah warna dan memasang aksi klik
+                ((android.app.Activity) context).runOnUiThread(() -> {
+                    holder.imgFavoriteHeart.setColorFilter(android.graphics.Color.parseColor(isFavorited ? "#FF3B30" : "#BDBDBD"));
+
+                    // AKSI KLIK HARUS DI DALAM SINI (UI THREAD)
+                    holder.btnFavoriteLayout.setOnClickListener(v -> {
+                        new Thread(() -> {
+                            Favorit cekLagi = favDao.cekFavorit(currentEmail, kue.getNama());
+                            if (cekLagi != null) {
+                                favDao.hapusFavorit(currentEmail, kue.getNama()); // Unlove
+                                ((android.app.Activity) context).runOnUiThread(() -> {
+                                    holder.imgFavoriteHeart.setColorFilter(android.graphics.Color.parseColor("#BDBDBD"));
+                                });
+                            } else {
+                                favDao.insertFavorit(new Favorit(currentEmail, kue.getNama())); // Love
+                                ((android.app.Activity) context).runOnUiThread(() -> {
+                                    holder.imgFavoriteHeart.setColorFilter(android.graphics.Color.parseColor("#FF3B30"));
+                                });
+                            }
+                        }).start();
+                    });
+                });
+            }).start();
         }
     }
 
@@ -86,13 +115,12 @@ public class KueAdapter extends RecyclerView.Adapter<KueAdapter.KueViewHolder> {
                 .setTitle("Hapus Produk")
                 .setMessage("Apakah kamu yakin ingin menghapus " + kue.getNama() + "?")
                 .setPositiveButton("Ya, Hapus", (dialog, which) -> {
-                    // Jalankan operasi delete database di background thread
                     new Thread(() -> {
                         AppDatabase.getInstance(context).kueDao().deleteKue(kue);
 
-                        // Update tampilan list secara real-time
-                        kueList.remove(position);
-                        ((AdminActivity) context).runOnUiThread(() -> {
+                        // PERBAIKAN: Gunakan ((Activity) context) agar aman di Fragment
+                        ((android.app.Activity) context).runOnUiThread(() -> {
+                            kueList.remove(position);
                             notifyItemRemoved(position);
                             notifyItemRangeChanged(position, kueList.size());
                             Toast.makeText(context, "Produk berhasil dihapus", Toast.LENGTH_SHORT).show();
@@ -109,7 +137,8 @@ public class KueAdapter extends RecyclerView.Adapter<KueAdapter.KueViewHolder> {
     }
 
     public static class KueViewHolder extends RecyclerView.ViewHolder {
-        // Hapus variabel tvUlasan
+        CardView btnFavoriteLayout;
+        ImageView imgFavoriteHeart;
         TextView tvNama, tvHarga, tvRating;
         ImageView imgKue;
 
@@ -117,9 +146,12 @@ public class KueAdapter extends RecyclerView.Adapter<KueAdapter.KueViewHolder> {
             super(itemView);
             tvNama = itemView.findViewById(R.id.tvNamaKue);
             tvHarga = itemView.findViewById(R.id.tvHargaKue);
-            // Sesuaikan ID ini dengan yang ada di XML kamu
             tvRating = itemView.findViewById(R.id.tvRating);
             imgKue = itemView.findViewById(R.id.imgKue);
+
+            // PERBAIKAN: Wajib diinisialisasi agar tidak NullPointerException
+            btnFavoriteLayout = itemView.findViewById(R.id.btnFavoriteLayout);
+            imgFavoriteHeart = itemView.findViewById(R.id.imgFavoriteHeart);
         }
     }
 }

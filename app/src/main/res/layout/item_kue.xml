@@ -24,14 +24,24 @@
                 android:scaleType="centerCrop"
                 android:background="#E0E0E0" />
 
-            <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_gravity="top|end"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/btnFavoriteLayout"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_alignParentEnd="true"
                 android:layout_margin="8dp"
-                android:background="@drawable/bg_search_rounded"
-                android:padding="6dp"
-                android:src="@android:drawable/ic_menu_myplaces" />
+                app:cardCornerRadius="18dp"
+                app:cardElevation="2dp">
+
+                <ImageView
+                    android:id="@+id/imgFavoriteHeart"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="8dp"
+                    android:background="@drawable/bg_search_rounded"
+                    android:src="@drawable/ic_favorite"
+                    app:tint="#BDBDBD" />
+            </androidx.cardview.widget.CardView>
         </FrameLayout>
 
         <LinearLayout
