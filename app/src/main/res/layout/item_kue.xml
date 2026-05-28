@@ -15,19 +15,23 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="160dp"> <ImageView
-            android:id="@+id/imgKue"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:background="#E0E0E0" />
+            android:layout_height="160dp">
+
+            <ImageView
+                android:id="@+id/imgKue"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:background="#E0E0E0" />
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/btnFavoriteLayout"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:layout_gravity="top|end"  android:layout_margin="12dp"
-                app:cardBackgroundColor="#FFFFFF" app:cardCornerRadius="18dp"
+                android:layout_gravity="top|end"
+                android:layout_margin="12dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="18dp"
                 app:cardElevation="2dp">
 
                 <ImageView
@@ -36,7 +40,8 @@
                     android:layout_height="match_parent"
                     android:padding="8dp"
                     android:src="@drawable/ic_favorite"
-                    app:tint="#BDBDBD" /> </androidx.cardview.widget.CardView>
+                    app:tint="#BDBDBD" />
+            </androidx.cardview.widget.CardView>
         </FrameLayout>
 
         <LinearLayout
@@ -49,6 +54,9 @@
                 android:id="@+id/tvNamaKue"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minLines="2"
+                android:maxLines="2"
+                android:ellipsize="end"
                 android:text="Nama Kue"
                 android:textColor="#1E1C18"
                 android:textSize="16sp"
@@ -58,7 +66,7 @@
                 android:id="@+id/tvHargaKue"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="6dp"
                 android:text="Rp 0"
                 android:textColor="#F5A67B"
                 android:textSize="14sp" />
@@ -67,7 +75,7 @@
                 android:id="@+id/tvRating"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="8dp"
                 android:text="⭐ 0.0 (0)"
                 android:textSize="12sp"
                 android:textColor="#757575"/>
