@@ -1,5 +1,6 @@
 package com.example.kueweh;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
@@ -43,17 +44,22 @@ public class AddProductActivity extends AppCompatActivity {
         spinnerKategori.setAdapter(spinnerAdapter);
 
         // Ambil Foto dari Galeri
-        ActivityResultLauncher<String> ambilFotoDariGaleri = registerForActivityResult(
-                new ActivityResultContracts.GetContent(),
+        // KODE BARU: Menggunakan OpenDocument dan Minta Izin Permanen
+        ActivityResultLauncher<String[]> ambilFotoDariGaleri = registerForActivityResult(
+                new ActivityResultContracts.OpenDocument(),
                 uri -> {
                     if (uri != null) {
+                        // KUNCI IZIN AKSES SECARA PERMANEN
+                        getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
                         selectedImageUri = uri.toString();
                         Glide.with(this).load(uri).into(imgPreview);
                     }
                 }
         );
 
-        btnPilihFoto.setOnClickListener(v -> ambilFotoDariGaleri.launch("image/*"));
+        // KODE BARU: Perhatikan penggunaan new String[]
+        btnPilihFoto.setOnClickListener(v -> ambilFotoDariGaleri.launch(new String[]{"image/*"}));
 
         // Simpan Produk ke SQLite
         btnSimpan.setOnClickListener(v -> {
