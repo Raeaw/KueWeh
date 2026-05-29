@@ -6,6 +6,7 @@
     android:background="#F9F9F9"
     android:orientation="vertical">
 
+    <!-- HEADER SECTION -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -13,22 +14,48 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- Baris Utama: Teks di Kiri, Logo di Kanan -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Kue Weh!"
-            android:textColor="#FFFFFF"
-            android:textSize="28sp"
-            android:textStyle="bold" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="Temukan kue favoritmu"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp" />
+            <!-- Bagian Teks (Mengambil sisa ruang kosong) -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Kue Weh!"
+                    android:textColor="#FFFFFF"
+                    android:textSize="28sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Temukan kue favoritmu"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- Bagian Logo -->
+            <ImageView
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:src="@drawable/ic_logo_kueweh"
+                android:scaleType="fitCenter"
+                android:scaleX="1.8"
+                android:scaleY="1.8" />
+        </LinearLayout>
+
+        <!-- Search Bar -->
         <EditText
             android:id="@+id/etSearch"
             android:layout_width="match_parent"
@@ -42,6 +69,7 @@
             android:textSize="14sp" />
     </LinearLayout>
 
+    <!-- FILTER SECTION -->
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -100,6 +128,7 @@
         </LinearLayout>
     </HorizontalScrollView>
 
+    <!-- KONTEN PRODUK -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvKue"
         android:layout_width="match_parent"
