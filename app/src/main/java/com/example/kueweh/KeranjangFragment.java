@@ -62,7 +62,7 @@ public class KeranjangFragment extends Fragment implements KeranjangAdapter.Kera
 
                     String hargaFinal = "Rp " + NumberFormat.getNumberInstance(new Locale("id", "ID")).format(totalPerItem) + " (" + item.getJumlah() + "x)";
 
-                    Pesanan pesanan = new Pesanan(currentEmail, item.getNamaKue(), hargaFinal, item.getImageUrl(), batchTimestamp);
+                    Pesanan pesanan = new Pesanan(currentEmail, item.getNamaKue(), hargaFinal, item.getImageUrl(), batchTimestamp, "Pending");
                     db.pesananDao().insertPesanan(pesanan);
                 }
 
