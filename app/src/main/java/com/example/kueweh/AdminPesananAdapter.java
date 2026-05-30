@@ -61,6 +61,9 @@ public class AdminPesananAdapter extends RecyclerView.Adapter<AdminPesananAdapte
             ImageView img = itemView.findViewById(R.id.imgPesanan);
             TextView tvRatingItem = itemView.findViewById(R.id.tvRatingItem);
 
+            TextView tvBadgePelanggan = itemView.findViewById(R.id.tvStatusPesananBadge);
+            tvBadgePelanggan.setVisibility(View.GONE);
+
             // Komponen Admin Per Item (yang baru ditambahkan di XML)
             LinearLayout layoutAdminControl = itemView.findViewById(R.id.layoutAdminItemControl);
             TextView tvItemStatus = itemView.findViewById(R.id.tvAdminItemStatus);
