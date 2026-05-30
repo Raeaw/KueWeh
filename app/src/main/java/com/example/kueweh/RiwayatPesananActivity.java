@@ -71,8 +71,6 @@ public class RiwayatPesananActivity extends AppCompatActivity {
                 batchList.add(new BatchPesanan(entry.getKey(), entry.getValue()));
             }
 
-            // -----------------------------------------------------
-
             // 3. Masukkan data yang sudah berkelompok ke BatchAdapter
             adapter = new BatchAdapter(this, batchList);
             rvRiwayat.setAdapter(adapter);
