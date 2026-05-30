@@ -68,11 +68,12 @@
                 android:padding="4dp"/>
 
             <TextView
+                android:id="@+id/tvStatusPesananBadge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="#E8F5E9"
-                android:textColor="#2E7D32"
-                android:text="Selesai"
+                android:background="#FFF3E0"
+                android:textColor="#FF9800"
+                android:text="Pending"
                 android:textSize="10sp"
                 android:textStyle="bold"
                 android:paddingHorizontal="8dp"
