@@ -7,8 +7,8 @@ import androidx.room.PrimaryKey;
 public class Pesanan {
 
     @PrimaryKey(autoGenerate = true)
-    private int id;
 
+    public int id;
     private String userEmail;
     private String namaKue;
     private String hargaKue;

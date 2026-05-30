@@ -44,37 +44,15 @@ public class AdminPesananAdapter extends RecyclerView.Adapter<AdminPesananAdapte
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy - HH:mm", new Locale("id", "ID"));
         holder.tvWaktu.setText(sdf.format(new Date(batch.timestamp)).toUpperCase());
 
-        // Ambil status dari item pertama di batch ini
-        String statusSaatIni = batch.items.get(0).status;
-
-        // Atur Tampilan berdasarkan Status
-        holder.tvStatus.setText("Status: " + statusSaatIni);
-
-        if ("Pending".equals(statusSaatIni)) {
-            holder.tvStatus.setTextColor(Color.parseColor("#FF9800")); // Orange
-            holder.btnAksi.setVisibility(View.VISIBLE);
-            holder.btnAksi.setText("Terima Pesanan");
-            holder.btnAksi.setBackgroundColor(Color.parseColor("#2196F3")); // Biru
-
-            holder.btnAksi.setOnClickListener(v -> updateStatus(batch.timestamp, "Diproses", position));
-
-        } else if ("Diproses".equals(statusSaatIni)) {
-            holder.tvStatus.setTextColor(Color.parseColor("#2196F3")); // Biru
-            holder.btnAksi.setVisibility(View.VISIBLE);
-            holder.btnAksi.setText("Selesaikan");
-            holder.btnAksi.setBackgroundColor(Color.parseColor("#4CAF50")); // Hijau
-
-            holder.btnAksi.setOnClickListener(v -> updateStatus(batch.timestamp, "Selesai", position));
-
-        } else {
-            // Jika status Selesai atau lainnya
-            holder.tvStatus.setTextColor(Color.parseColor("#4CAF50")); // Hijau
-            holder.btnAksi.setVisibility(View.GONE); // Sembunyikan tombol
-        }
-
         holder.containerItems.removeAllViews();
-        int totalHargaBatch = 0;
 
+        int totalHargaBatch = 0;
+        int countPending = 0;
+        int countDiproses = 0;
+        int countSelesai = 0;
+        int totalItems = batch.items.size();
+
+        // 1. Render setiap item dan pasang tombol aksinya
         for (Pesanan item : batch.items) {
             View itemView = LayoutInflater.from(context).inflate(R.layout.item_pesanan, holder.containerItems, false);
 
@@ -83,11 +61,44 @@ public class AdminPesananAdapter extends RecyclerView.Adapter<AdminPesananAdapte
             ImageView img = itemView.findViewById(R.id.imgPesanan);
             TextView tvRatingItem = itemView.findViewById(R.id.tvRatingItem);
 
+            // Komponen Admin Per Item (yang baru ditambahkan di XML)
+            LinearLayout layoutAdminControl = itemView.findViewById(R.id.layoutAdminItemControl);
+            TextView tvItemStatus = itemView.findViewById(R.id.tvAdminItemStatus);
+            Button btnItemAksi = itemView.findViewById(R.id.btnAdminItemAksi);
+
             tvNama.setText(item.getNamaKue());
             tvHarga.setText(item.getHargaKue());
             Glide.with(context).load(item.getImageUrl()).into(img);
             tvRatingItem.setVisibility(View.GONE);
 
+            // Tampilkan panel admin
+            layoutAdminControl.setVisibility(View.VISIBLE);
+            tvItemStatus.setText(item.status);
+
+            // Logika Tombol & Penghitungan Status
+            if ("Pending".equals(item.status)) {
+                countPending++;
+                tvItemStatus.setTextColor(Color.parseColor("#FF9800"));
+                btnItemAksi.setVisibility(View.VISIBLE);
+                btnItemAksi.setText("Terima");
+                btnItemAksi.setBackgroundColor(Color.parseColor("#2196F3"));
+                btnItemAksi.setOnClickListener(v -> updateItemStatus(item.id, "Diproses", position));
+
+            } else if ("Diproses".equals(item.status)) {
+                countDiproses++;
+                tvItemStatus.setTextColor(Color.parseColor("#2196F3"));
+                btnItemAksi.setVisibility(View.VISIBLE);
+                btnItemAksi.setText("Selesai");
+                btnItemAksi.setBackgroundColor(Color.parseColor("#4CAF50"));
+                btnItemAksi.setOnClickListener(v -> updateItemStatus(item.id, "Selesai", position));
+
+            } else {
+                countSelesai++;
+                tvItemStatus.setTextColor(Color.parseColor("#4CAF50"));
+                btnItemAksi.setVisibility(View.GONE); // Hilangkan tombol jika sudah selesai
+            }
+
+            // Hitung harga
             String hargaSaja = item.getHargaKue().split(" \\(")[0];
             String hargaBersih = hargaSaja.replaceAll("[^0-9]", "");
             if (!hargaBersih.isEmpty()) {
@@ -97,23 +108,38 @@ public class AdminPesananAdapter extends RecyclerView.Adapter<AdminPesananAdapte
             holder.containerItems.addView(itemView);
         }
 
+        // 2. Set Teks Rangkuman Rombongan (Batch Indicator)
+        if (countSelesai == totalItems) {
+            holder.tvStatus.setText("Status: Semua Selesai ✅");
+            holder.tvStatus.setTextColor(Color.parseColor("#4CAF50"));
+        } else if (countPending == totalItems) {
+            holder.tvStatus.setText("Status: Belum Diproses ⏳");
+            holder.tvStatus.setTextColor(Color.parseColor("#FF9800"));
+        } else {
+            holder.tvStatus.setText("Status: Sebagian Diproses (" + countSelesai + "/" + totalItems + ") 🔄");
+            holder.tvStatus.setTextColor(Color.parseColor("#2196F3"));
+        }
+
         NumberFormat formatRupiah = NumberFormat.getNumberInstance(new Locale("id", "ID"));
         holder.tvTotal.setText("Total Pendapatan: Rp " + formatRupiah.format(totalHargaBatch));
     }
 
-    // Fungsi untuk memperbarui status di Database dan UI
-    private void updateStatus(long timestamp, String statusBaru, int position) {
+    // Fungsi untuk memperbarui status 1 item spesifik
+    private void updateItemStatus(int itemId, String statusBaru, int batchPosition) {
         new Thread(() -> {
-            AppDatabase.getInstance(context).pesananDao().updateStatusBatch(timestamp, statusBaru);
+            AppDatabase.getInstance(context).pesananDao().updateStatusItem(itemId, statusBaru);
 
-            // Perbarui data lokal di adapter dan refresh kartu tersebut
-            for (Pesanan p : batchList.get(position).items) {
-                p.status = statusBaru;
+            // Perbarui data lokal di adapter agar sinkron
+            for (Pesanan p : batchList.get(batchPosition).items) {
+                if (p.id == itemId) {
+                    p.status = statusBaru;
+                    break;
+                }
             }
 
             ((Activity) context).runOnUiThread(() -> {
-                notifyItemChanged(position);
-                android.widget.Toast.makeText(context, "Pesanan " + statusBaru, android.widget.Toast.LENGTH_SHORT).show();
+                // Refresh HANYA kotak batch yang sedang diubah
+                notifyItemChanged(batchPosition);
             });
         }).start();
     }
@@ -123,7 +149,6 @@ public class AdminPesananAdapter extends RecyclerView.Adapter<AdminPesananAdapte
 
     public static class AdminViewHolder extends RecyclerView.ViewHolder {
         TextView tvEmail, tvWaktu, tvTotal, tvStatus;
-        Button btnAksi;
         LinearLayout containerItems;
 
         public AdminViewHolder(@NonNull View itemView) {
@@ -132,7 +157,6 @@ public class AdminPesananAdapter extends RecyclerView.Adapter<AdminPesananAdapte
             tvWaktu = itemView.findViewById(R.id.tvAdminWaktuPesan);
             tvTotal = itemView.findViewById(R.id.tvAdminTotalBatch);
             tvStatus = itemView.findViewById(R.id.tvAdminStatusBatch);
-            btnAksi = itemView.findViewById(R.id.btnAdminAksiPesanan);
             containerItems = itemView.findViewById(R.id.containerAdminItems);
         }
     }
