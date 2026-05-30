@@ -13,19 +13,19 @@ public class Pesanan {
     private String namaKue;
     private String hargaKue;
     private String imageUrl;
-
-    // Dua variabel baru
     private long timestamp;
     private float rating;
+    public String status;
 
     // Constructor
-    public Pesanan(String userEmail, String namaKue, String hargaKue, String imageUrl, long timestamp) {
+    public Pesanan(String userEmail, String namaKue, String hargaKue, String imageUrl, long timestamp, String status) {
         this.userEmail = userEmail;
         this.namaKue = namaKue;
         this.hargaKue = hargaKue;
         this.imageUrl = imageUrl;
-        this.timestamp = timestamp; // <-- INI SANGAT KRUSIAL
-        this.rating = 0; // Default rating 0
+        this.timestamp = timestamp;
+        this.rating = 0;
+        this.status = status;
     }
 
     // --- GETTER DAN SETTER ---
@@ -50,4 +50,7 @@ public class Pesanan {
 
     public float getRating() { return rating; }
     public void setRating(float rating) { this.rating = rating; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

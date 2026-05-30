@@ -40,4 +40,8 @@ public interface PesananDao {
     // Mengambil SEMUA data pesanan untuk dipantau oleh Admin (diurutkan dari yang terbaru)
     @Query("SELECT * FROM tabel_pesanan ORDER BY timestamp DESC")
     List<Pesanan> getAllPesananForAdmin();
+
+    // Fungsi untuk Admin mengubah status pesanan
+    @Query("UPDATE tabel_pesanan SET status = :newStatus WHERE timestamp = :timestamp")
+    void updateStatusBatch(long timestamp, String newStatus);
 }
