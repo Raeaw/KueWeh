@@ -44,4 +44,8 @@ public interface PesananDao {
     // Fungsi untuk Admin mengubah status pesanan
     @Query("UPDATE tabel_pesanan SET status = :newStatus WHERE timestamp = :timestamp")
     void updateStatusBatch(long timestamp, String newStatus);
+
+    // Fungsi untuk Admin mengubah status per item spesifik
+    @Query("UPDATE tabel_pesanan SET status = :newStatus WHERE id = :itemId")
+    void updateStatusItem(int itemId, String newStatus);
 }
