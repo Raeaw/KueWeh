@@ -55,19 +55,6 @@
             android:textColor="#FF9800"
             android:textSize="14sp"
             android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/btnAdminAksiPesanan"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:backgroundTint="#2196F3"
-            android:text="Terima Pesanan"
-            android:textColor="#FFFFFF"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:paddingHorizontal="16dp"/>
     </LinearLayout>
 
     <LinearLayout
