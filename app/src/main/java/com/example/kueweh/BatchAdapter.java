@@ -91,7 +91,7 @@ public class BatchAdapter extends RecyclerView.Adapter<BatchAdapter.BatchViewHol
             }
 
             // 2. Logika Teks Rating
-            tvRatingItem.setText(item.getRating() == 0 ? "⭐ Beri Rating" : "⭐ " + item.getRating());
+            tvRatingItem.setText(item.getRating() == 0 ? "⭐ Rating" : "⭐ " + item.getRating());
 
             // 3. Logika Kunci Klik Rating (Berdasarkan Status)
             if ("Selesai".equals(statusSaatIni)) {
