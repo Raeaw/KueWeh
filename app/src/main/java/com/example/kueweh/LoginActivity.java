@@ -19,6 +19,12 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Membuat layar menembus status bar (Edge-to-Edge)
+        getWindow().getDecorView().setSystemUiVisibility(
+                android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+                        android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+                        android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        );
 
         // Cek Session: Jika pengguna sudah login sebelumnya, langsung lempar ke MainActivity
         SharedPreferences sharedPref = getSharedPreferences("KueWehSession", MODE_PRIVATE);
