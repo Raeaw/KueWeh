@@ -110,6 +110,7 @@
             android:backgroundTint="#FF5252"
             android:text="Keluar / Logout"
             android:textColor="#FFFFFF"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textAllCaps="false"/>
 
     </LinearLayout> </LinearLayout>

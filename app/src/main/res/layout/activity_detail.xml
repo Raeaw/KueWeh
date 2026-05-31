@@ -140,7 +140,8 @@
             android:text="Pesan"
             android:textColor="#FFFFFF"
             android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textAllCaps="false"/>
     </LinearLayout>
 
     <RelativeLayout

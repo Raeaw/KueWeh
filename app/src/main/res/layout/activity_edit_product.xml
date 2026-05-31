@@ -34,7 +34,8 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             android:backgroundTint="#757575"
-            android:text="Ubah Foto Produk" />
+            android:text="Ubah Foto Produk"
+            android:textAllCaps="false"/>
 
         <EditText
             android:id="@+id/etEditNamaKue"
@@ -79,7 +80,8 @@
             android:backgroundTint="#F5A67B"
             android:text="Simpan Perubahan"
             android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textAllCaps="false"/>
 
     </LinearLayout>
 </ScrollView>
