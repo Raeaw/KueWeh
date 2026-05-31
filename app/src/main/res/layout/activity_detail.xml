@@ -143,32 +143,38 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/btnBack"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_margin="16dp"
-        android:background="@drawable/bg_search_rounded"
-        android:padding="8dp"
-        android:src="@android:drawable/ic_menu_revert" />
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/btnDetailFavoriteLayout"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_alignParentEnd="true"
-        android:layout_margin="16dp"
-        app:cardBackgroundColor="#FFFFFF"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="4dp">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true">
 
         <ImageView
-            android:id="@+id/imgDetailFavoriteHeart"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="10dp"
-            android:src="@drawable/ic_favorite"
-            app:tint="#BDBDBD" />
-    </androidx.cardview.widget.CardView>
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="16dp"
+            android:background="@drawable/bg_search_rounded"
+            android:padding="8dp"
+            android:src="@android:drawable/ic_menu_revert" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/btnDetailFavoriteLayout"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="16dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="4dp">
+
+            <ImageView
+                android:id="@+id/imgDetailFavoriteHeart"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="10dp"
+                android:src="@drawable/ic_favorite"
+                app:tint="#BDBDBD" />
+        </androidx.cardview.widget.CardView>
+    </RelativeLayout>
 
 </RelativeLayout>
