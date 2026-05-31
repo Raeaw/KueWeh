@@ -39,23 +39,44 @@ public class RegisterActivity extends AppCompatActivity {
             String password = etPassword.getText().toString();
             String konfirmasi = etKonfirmasi.getText().toString();
 
+            // 1. Cek apakah ada kolom yang kosong
             if (nama.isEmpty() || email.isEmpty() || password.isEmpty() || konfirmasi.isEmpty()) {
                 Toast.makeText(this, "Semua kolom wajib diisi", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            if (!password.equals(konfirmasi)) {
-                Toast.makeText(this, "Konfirmasi password tidak cocok", Toast.LENGTH_SHORT).show();
+            // 2. Validasi Format Email (Hanya mengizinkan format email yang benar)
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                etEmail.setError("Format email tidak valid! (Contoh: nama@email.com)");
+                etEmail.requestFocus();
                 return;
             }
 
-            // Jalankan operasi database di thread terpisah (atau gunakan allowMainThreadQueries jika diizinkan di AppDatabase)
+            // 3. Validasi Panjang Password (Minimal 6 karakter)
+            if (password.length() < 6) {
+                etPassword.setError("Password minimal 6 karakter");
+                etPassword.requestFocus();
+                return;
+            }
+
+            // 4. Validasi Kecocokan Konfirmasi Password
+            if (!password.equals(konfirmasi)) {
+                etKonfirmasi.setError("Konfirmasi password tidak cocok");
+                etKonfirmasi.requestFocus();
+                return;
+            }
+
+            // Jalankan operasi database di thread terpisah
             new Thread(() -> {
                 UserDao userDao = AppDatabase.getInstance(RegisterActivity.this).userDao();
 
-                // Validasi email unik
+                // Validasi email unik (Mencegah email yang sama didaftarkan 2 kali)
                 if (userDao.getUserByEmail(email) != null) {
-                    runOnUiThread(() -> Toast.makeText(RegisterActivity.this, "Email sudah terdaftar!", Toast.LENGTH_SHORT).show());
+                    runOnUiThread(() -> {
+                        etEmail.setError("Email sudah terdaftar!");
+                        etEmail.requestFocus();
+                        Toast.makeText(RegisterActivity.this, "Gunakan email lain atau silakan Login", Toast.LENGTH_SHORT).show();
+                    });
                     return;
                 }
 
