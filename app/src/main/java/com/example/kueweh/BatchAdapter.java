@@ -130,26 +130,56 @@ public class BatchAdapter extends RecyclerView.Adapter<BatchAdapter.BatchViewHol
                 .setTitle("Beri Rating untuk " + item.getNamaKue())
                 .setItems(levels, (dialog, which) -> {
                     float ratingBaru = which + 1;
+                    float ratingLama = item.getRating(); // Ambil rating lama jika pengguna sekadar "Update Rating"
 
                     new Thread(() -> {
-                        item.setRating(ratingBaru);
-                        PesananDao pesananDao = AppDatabase.getInstance(context).pesananDao();
-                        pesananDao.updatePesanan(item);
-
-                        float trueGlobalAvg = pesananDao.getTrueGlobalAverageRating(item.getNamaKue());
-                        int reviewerCount = pesananDao.getReviewerCount(item.getNamaKue());
-
+                        // 1. Ambil data katalog kue saat ini
                         KueDao kueDao = AppDatabase.getInstance(context).kueDao();
                         Kue kueKatalog = kueDao.getKueByName(item.getNamaKue());
+
                         if (kueKatalog != null) {
-                            kueKatalog.setRating(String.format(Locale.US, "%.1f", trueGlobalAvg));
-                            kueKatalog.setUlasan("(" + reviewerCount + ")");
-                            kueDao.updateKue(kueKatalog);
+                            try {
+                                // 2. Ekstrak string menjadi angka murni
+                                // "4.9" -> 4.9f
+                                float avgSaatIni = Float.parseFloat(kueKatalog.getRating());
+
+                                // "(156)" -> buang tanda kurung -> 156
+                                String ulasanStr = kueKatalog.getUlasan().replaceAll("[^0-9]", "");
+                                int jumlahUlasanSaatIni = Integer.parseInt(ulasanStr);
+
+                                float avgBaru;
+                                int jumlahUlasanBaru;
+
+                                // 3. Rumus Kalkulasi (Moving Average)
+                                if (ratingLama == 0) {
+                                    // Pengguna BARU pertama kali memberi ulasan
+                                    float totalNilai = (avgSaatIni * jumlahUlasanSaatIni) + ratingBaru;
+                                    jumlahUlasanBaru = jumlahUlasanSaatIni + 1;
+                                    avgBaru = totalNilai / jumlahUlasanBaru;
+                                } else {
+                                    // Pengguna MENGUBAH ulasan (Tidak menambah jumlah orang)
+                                    float totalNilai = (avgSaatIni * jumlahUlasanSaatIni) - ratingLama + ratingBaru;
+                                    jumlahUlasanBaru = jumlahUlasanSaatIni;
+                                    avgBaru = totalNilai / jumlahUlasanBaru;
+                                }
+
+                                // 4. Simpan kembali ke katalog sebagai String
+                                kueKatalog.setRating(String.format(Locale.US, "%.1f", avgBaru));
+                                kueKatalog.setUlasan("(" + jumlahUlasanBaru + ")");
+                                kueDao.updateKue(kueKatalog);
+
+                            } catch (Exception e) {
+                                e.printStackTrace(); // Jaga-jaga jika format string gagal di-parse
+                            }
                         }
+
+                        // 5. Simpan rating ke tabel riwayat pesanan (Tabel Pelanggan)
+                        item.setRating(ratingBaru);
+                        AppDatabase.getInstance(context).pesananDao().updatePesanan(item);
 
                         if (context instanceof Activity) {
                             ((Activity) context).runOnUiThread(() -> {
-                                Toast.makeText(context, "Terima kasih atas ratingnya!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "Terima kasih atas ulasannya!", Toast.LENGTH_SHORT).show();
                                 ((Activity) context).recreate();
                             });
                         }
