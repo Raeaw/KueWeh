@@ -48,4 +48,12 @@ public interface PesananDao {
     // Fungsi untuk Admin mengubah status per item spesifik
     @Query("UPDATE tabel_pesanan SET status = :newStatus WHERE id = :itemId")
     void updateStatusItem(int itemId, String newStatus);
+
+    // Mengecek berapa kali user INI sudah merating kue INI
+    @Query("SELECT COUNT(id) FROM tabel_pesanan WHERE namaKue = :kue AND email = :userEmail AND rating > 0")
+    int countRiwayatRatingPersonal(String kue, String userEmail);
+
+    // Mengambil nilai rata-rata personal user INI untuk kue INI
+    @Query("SELECT AVG(rating) FROM tabel_pesanan WHERE namaKue = :kue AND email = :userEmail AND rating > 0")
+    float getRataRataPersonal(String kue, String userEmail);
 }
