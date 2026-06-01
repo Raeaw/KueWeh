@@ -21,7 +21,7 @@ public interface PesananDao {
     void updatePesanan(Pesanan pesanan);
 
     // Mengambil rata-rata rating sebuah kue (hanya yang sudah diberi rating > 0)
-// 1. Menghitung rata-rata rating Global (Tiap akun dihitung 1 suara rata-rata)
+    // 1. Menghitung rata-rata rating Global (Tiap akun dihitung 1 suara rata-rata)
     @Query("SELECT COALESCE(AVG(userAvg), 0.0) FROM (SELECT AVG(rating) AS userAvg FROM tabel_pesanan WHERE namaKue = :nama AND rating > 0 GROUP BY userEmail)")
     float getTrueGlobalAverageRating(String nama);
 
@@ -50,10 +50,10 @@ public interface PesananDao {
     void updateStatusItem(int itemId, String newStatus);
 
     // Mengecek berapa kali user INI sudah merating kue INI
-    @Query("SELECT COUNT(id) FROM tabel_pesanan WHERE namaKue = :kue AND email = :userEmail AND rating > 0")
+    @Query("SELECT COUNT(id) FROM tabel_pesanan WHERE namaKue = :kue AND userEmail = :userEmail AND rating > 0")
     int countRiwayatRatingPersonal(String kue, String userEmail);
 
-    // Mengambil nilai rata-rata personal user INI untuk kue INI
-    @Query("SELECT AVG(rating) FROM tabel_pesanan WHERE namaKue = :kue AND email = :userEmail AND rating > 0")
+    // Mengambil nilai rata-rata personal user INI untuk kue INI (DITAMBAHKAN COALESCE)
+    @Query("SELECT COALESCE(AVG(rating), 0.0) FROM tabel_pesanan WHERE namaKue = :kue AND userEmail = :userEmail AND rating > 0")
     float getRataRataPersonal(String kue, String userEmail);
 }

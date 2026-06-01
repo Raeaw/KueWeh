@@ -3,6 +3,7 @@ package com.example.kueweh;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.SharedPreferences; // Tambahan Import
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -130,52 +131,73 @@ public class BatchAdapter extends RecyclerView.Adapter<BatchAdapter.BatchViewHol
                 .setTitle("Beri Rating untuk " + item.getNamaKue())
                 .setItems(levels, (dialog, which) -> {
                     float ratingBaru = which + 1;
-                    float ratingLama = item.getRating(); // Ambil rating lama jika pengguna sekadar "Update Rating"
+
+                    // MENGAMBIL EMAIL LANGSUNG DARI DATA PESANAN (Jauh lebih aman)
+                    String emailPelanggan = item.getUserEmail();
+
+                    // Validasi jika saat checkout emailnya ternyata gagal tersimpan
+                    if (emailPelanggan == null || emailPelanggan.isEmpty()) {
+                        if (context instanceof Activity) {
+                            ((Activity) context).runOnUiThread(() ->
+                                    Toast.makeText(context, "Error: Data email pesanan tidak valid!", Toast.LENGTH_SHORT).show()
+                            );
+                        }
+                        return; // Hentikan proses
+                    }
 
                     new Thread(() -> {
-                        // 1. Ambil data katalog kue saat ini
+                        PesananDao pesananDao = AppDatabase.getInstance(context).pesananDao();
                         KueDao kueDao = AppDatabase.getInstance(context).kueDao();
-                        Kue kueKatalog = kueDao.getKueByName(item.getNamaKue());
 
+                        // 1. Ambil data katalog (Dummy Base / Data Global Saat Ini)
+                        Kue kueKatalog = kueDao.getKueByName(item.getNamaKue());
                         if (kueKatalog != null) {
                             try {
-                                // 2. Ekstrak string menjadi angka murni
-                                // "4.9" -> 4.9f
                                 float avgSaatIni = Float.parseFloat(kueKatalog.getRating());
+                                int ulasanSaatIni = Integer.parseInt(kueKatalog.getUlasan().replaceAll("[^0-9]", ""));
+                                float totalNilaiGlobal = avgSaatIni * ulasanSaatIni;
 
-                                // "(156)" -> buang tanda kurung -> 156
-                                String ulasanStr = kueKatalog.getUlasan().replaceAll("[^0-9]", "");
-                                int jumlahUlasanSaatIni = Integer.parseInt(ulasanStr);
+                                // 2. REKAM JEJAK SEBELUM DISIMPAN: Ambil nilai personal LAMA
+                                int jumlahOrderYgPernahDirating = pesananDao.countRiwayatRatingPersonal(item.getNamaKue(), emailPelanggan);
+                                float rataRataPersonalLama = pesananDao.getRataRataPersonal(item.getNamaKue(), emailPelanggan);
 
-                                float avgBaru;
-                                int jumlahUlasanBaru;
+                                // 3. Simpan rating baru ke database Pesanan
+                                item.setRating(ratingBaru);
+                                pesananDao.updatePesanan(item);
 
-                                // 3. Rumus Kalkulasi (Moving Average)
-                                if (ratingLama == 0) {
-                                    // Pengguna BARU pertama kali memberi ulasan
-                                    float totalNilai = (avgSaatIni * jumlahUlasanSaatIni) + ratingBaru;
-                                    jumlahUlasanBaru = jumlahUlasanSaatIni + 1;
-                                    avgBaru = totalNilai / jumlahUlasanBaru;
+                                // 4. REKAM JEJAK SETELAH DISIMPAN: Ambil nilai personal BARU
+                                float rataRataPersonalBaru = pesananDao.getRataRataPersonal(item.getNamaKue(), emailPelanggan);
+
+                                float avgGlobalBaru;
+                                int ulasanGlobalBaru;
+
+                                // 5. ALGORITMA PENENTUAN
+                                if (jumlahOrderYgPernahDirating == 0) {
+                                    // KASUS A: Pengguna BARU pertama kali merating kue ini
+                                    ulasanGlobalBaru = ulasanSaatIni + 1; // Orang bertambah
+                                    totalNilaiGlobal = totalNilaiGlobal + ratingBaru;
                                 } else {
-                                    // Pengguna MENGUBAH ulasan (Tidak menambah jumlah orang)
-                                    float totalNilai = (avgSaatIni * jumlahUlasanSaatIni) - ratingLama + ratingBaru;
-                                    jumlahUlasanBaru = jumlahUlasanSaatIni;
-                                    avgBaru = totalNilai / jumlahUlasanBaru;
+                                    // KASUS B: Pengguna LAMA merating pesanan keduanya/ketiganya
+                                    ulasanGlobalBaru = ulasanSaatIni; // Jumlah orang TETAP
+                                    // Cabut nilai rata-rata lamanya, masukkan nilai rata-rata barunya
+                                    totalNilaiGlobal = totalNilaiGlobal - rataRataPersonalLama + rataRataPersonalBaru;
                                 }
 
-                                // 4. Simpan kembali ke katalog sebagai String
-                                kueKatalog.setRating(String.format(Locale.US, "%.1f", avgBaru));
-                                kueKatalog.setUlasan("(" + jumlahUlasanBaru + ")");
+                                avgGlobalBaru = totalNilaiGlobal / ulasanGlobalBaru;
+
+                                // 6. Simpan kembali ke Katalog
+                                kueKatalog.setRating(String.format(Locale.US, "%.1f", avgGlobalBaru));
+                                kueKatalog.setUlasan("(" + ulasanGlobalBaru + ")");
                                 kueDao.updateKue(kueKatalog);
 
                             } catch (Exception e) {
-                                e.printStackTrace(); // Jaga-jaga jika format string gagal di-parse
+                                e.printStackTrace();
                             }
+                        } else {
+                            // Jaga-jaga update pesanan saja jika kue tidak ketemu
+                            item.setRating(ratingBaru);
+                            pesananDao.updatePesanan(item);
                         }
-
-                        // 5. Simpan rating ke tabel riwayat pesanan (Tabel Pelanggan)
-                        item.setRating(ratingBaru);
-                        AppDatabase.getInstance(context).pesananDao().updatePesanan(item);
 
                         if (context instanceof Activity) {
                             ((Activity) context).runOnUiThread(() -> {
