@@ -1,112 +1,185 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#F9F9F9">
+    android:background="#FFF8F3">
 
-    <ScrollView
+    <!-- Scrollable content -->
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/bottomBar"
-        android:fillViewport="true">
+        android:overScrollMode="never">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/imgDetailKue"
+            <!-- Hero Image -->
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:scaleType="centerCrop"
-                android:background="#E0E0E0" />
+                android:layout_height="320dp">
 
+                <ImageView
+                    android:id="@+id/imgDetailKue"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:background="#F0E8E0"/>
+
+                <!-- Gradient overlay -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:layout_gravity="bottom"
+                    android:background="@drawable/gradient_bottom_overlay"/>
+
+                <!-- Back button -->
+                <ImageView
+                    android:id="@+id/btnBack"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:layout_margin="16dp"
+                    android:background="@drawable/bg_circle_white"
+                    android:padding="10dp"
+                    android:src="@android:drawable/ic_menu_revert"
+                    android:fitsSystemWindows="true"/>
+
+                <!-- Fav button -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/btnDetailFavoriteLayout"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:layout_gravity="top|end"
+                    android:layout_margin="16dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="21dp"
+                    app:cardElevation="4dp">
+
+                    <ImageView
+                        android:id="@+id/imgDetailFavoriteHeart"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_favorite"
+                        app:tint="#BDBDBD"/>
+                </androidx.cardview.widget.CardView>
+            </FrameLayout>
+
+            <!-- Content card -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="24dp">
+                android:background="@drawable/bg_content_card_top"
+                android:layout_marginTop="-20dp"
+                android:paddingHorizontal="24dp"
+                android:paddingTop="28dp"
+                android:paddingBottom="120dp">
 
+                <!-- Kategori badge -->
                 <TextView
                     android:id="@+id/tvDetailKategori"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_chip_active"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="4dp"
+                    android:background="@drawable/bg_badge_kategori"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="5dp"
                     android:text="Kategori"
                     android:textColor="#FFFFFF"
-                    android:textSize="12sp"
+                    android:textSize="11sp"
                     android:textStyle="bold"
-                    android:layout_marginBottom="12dp"/>
+                    android:layout_marginBottom="14dp"/>
 
+                <!-- Nama -->
                 <TextView
                     android:id="@+id/tvDetailNama"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Nama Kue"
-                    android:textColor="#1E1C18"
-                    android:textSize="26sp"
-                    android:textStyle="bold" />
+                    android:textColor="#1A1A1A"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:lineSpacingMultiplier="1.1"/>
 
-                <TextView
-                    android:id="@+id/tvDetailRating"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="⭐ 0.0 (0 ulasan)"
-                    android:textColor="#757575"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/tvPersonalRating"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="Rating Anda: ⭐ 0.0 (0x beli)"
-                    android:textColor="#F5A67B"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-                <View
+                <!-- Rating global -->
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginVertical="20dp"
-                    android:background="#EEEEEE" />
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="6dp">
 
+                    <TextView
+                        android:id="@+id/tvDetailRating"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="⭐ 0.0 (0 ulasan)"
+                        android:textColor="#757575"
+                        android:textSize="13sp"/>
+                </LinearLayout>
+
+                <!-- Personal rating -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_personal_rating"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="6dp"
+                    android:layout_marginBottom="20dp">
+
+                    <TextView
+                        android:id="@+id/tvPersonalRating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Rating Anda: Belum pernah memesan"
+                        android:textColor="#FF7043"
+                        android:textSize="12sp"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+
+                <!-- Divider -->
+                <View
+                    android:layout_width="40dp"
+                    android:layout_height="3dp"
+                    android:background="#FF7043"
+                    android:layout_marginBottom="16dp"/>
+
+                <!-- Deskripsi -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Deskripsi Produk"
-                    android:textColor="#1E1C18"
-                    android:textSize="18sp"
+                    android:text="Tentang Produk"
+                    android:textColor="#1A1A1A"
+                    android:textSize="16sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="8dp"/>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Kue lezat dan berkualitas yang dibuat dengan bahan-bahan premium pilihan. Sangat cocok untuk menemani waktu santai Anda bersama keluarga atau orang terkasih."
-                    android:textColor="#7A7670"
+                    android:text="Kue lezat dan berkualitas dibuat dengan bahan-bahan premium pilihan. Sangat cocok untuk menemani waktu santai Anda bersama keluarga atau orang terkasih."
+                    android:textColor="#8D8D8D"
                     android:textSize="14sp"
-                    android:lineSpacingExtra="4dp"/>
-
+                    android:lineSpacingExtra="5dp"/>
             </LinearLayout>
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
+    <!-- Bottom bar fixed -->
     <LinearLayout
-        android:id="@+id/bottomBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom"
         android:background="#FFFFFF"
         android:elevation="16dp"
         android:orientation="horizontal"
-        android:paddingHorizontal="24dp"
-        android:paddingVertical="16dp"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="14dp"
         android:gravity="center_vertical">
 
         <LinearLayout
@@ -118,64 +191,30 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Total Harga"
-                android:textColor="#757575"
-                android:textSize="12sp" />
+                android:text="Harga"
+                android:textColor="#BDBDBD"
+                android:textSize="11sp"/>
 
             <TextView
                 android:id="@+id/tvDetailHarga"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Rp 0"
-                android:textColor="#F5A67B"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textColor="#FF7043"
+                android:textSize="22sp"
+                android:textStyle="bold"/>
         </LinearLayout>
 
         <Button
             android:id="@+id/btnPesanSekarang"
-            android:layout_width="150dp"
+            android:layout_width="160dp"
             android:layout_height="50dp"
-            android:backgroundTint="#1E1C18"
-            android:text="Pesan"
+            android:backgroundTint="#FF7043"
+            android:text="+ Keranjang"
             android:textColor="#FFFFFF"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:textStyle="bold"
             android:textAllCaps="false"/>
     </LinearLayout>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fitsSystemWindows="true">
-
-        <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_margin="16dp"
-            android:background="@drawable/bg_search_rounded"
-            android:padding="8dp"
-            android:src="@android:drawable/ic_menu_revert" />
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/btnDetailFavoriteLayout"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentEnd="true"
-            android:layout_margin="16dp"
-            app:cardBackgroundColor="#FFFFFF"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="4dp">
-
-            <ImageView
-                android:id="@+id/imgDetailFavoriteHeart"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="10dp"
-                android:src="@drawable/ic_favorite"
-                app:tint="#BDBDBD" />
-        </androidx.cardview.widget.CardView>
-    </RelativeLayout>
-
-</RelativeLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

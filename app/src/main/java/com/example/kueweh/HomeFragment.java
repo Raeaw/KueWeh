@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,11 +19,10 @@ import java.util.List;
 public class HomeFragment extends Fragment {
 
     private RecyclerView rvKue;
+    private LinearLayout emptyStateHome;  // tambahan empty state
     private KueDao kueDao;
     private TextView tvSemua, tvCake, tvCookies, tvDrink;
     private EditText etSearch;
-
-    // PERBAIKAN 1: Jadikan KueAdapter sebagai variabel global agar bisa diakses oleh onResume
     private KueAdapter adapter;
 
     @Nullable
@@ -31,6 +31,7 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         rvKue = view.findViewById(R.id.rvKue);
+        emptyStateHome = view.findViewById(R.id.emptyStateHome);
         rvKue.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
         tvSemua = view.findViewById(R.id.tvFilterSemua);
@@ -41,6 +42,7 @@ public class HomeFragment extends Fragment {
 
         kueDao = AppDatabase.getInstance(getContext()).kueDao();
 
+        // Seed data awal
         List<Kue> kueList = kueDao.getAllKue();
         if (kueList.isEmpty()) {
             kueDao.insertKue(new Kue("Chocolate Fudge Cake", "Rp 125.000", "4.8", "(124)", "https://juliemarieeats.com/wp-content/uploads/2023/08/Chocolate-Fudge-Cake-10-scaled.jpg", "Cake"));
@@ -53,47 +55,37 @@ public class HomeFragment extends Fragment {
 
         tampilkanData(kueList);
 
-        // --- FITUR SEARCH REAL-TIME ---
+        // Search real-time
         etSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String keyword = s.toString();
-
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String keyword = s.toString().trim();
                 if (!keyword.isEmpty()) {
                     ubahWarnaFilter(tvSemua);
-                    List<Kue> hasilPencarian = kueDao.searchKue(keyword);
-                    tampilkanData(hasilPencarian);
+                    tampilkanData(kueDao.searchKue(keyword));
                 } else {
                     tampilkanData(kueDao.getAllKue());
                 }
             }
-
-            @Override
-            public void afterTextChanged(Editable s) { }
+            @Override public void afterTextChanged(Editable s) {}
         });
 
-        // EVENT KLIK FILTER
+        // Filter chips
         tvSemua.setOnClickListener(v -> {
             ubahWarnaFilter(tvSemua);
             etSearch.setText("");
             tampilkanData(kueDao.getAllKue());
         });
-
         tvCake.setOnClickListener(v -> {
             ubahWarnaFilter(tvCake);
             etSearch.setText("");
             tampilkanData(kueDao.getKueByKategori("Cake"));
         });
-
         tvCookies.setOnClickListener(v -> {
             ubahWarnaFilter(tvCookies);
             etSearch.setText("");
             tampilkanData(kueDao.getKueByKategori("Cookies"));
         });
-
         tvDrink.setOnClickListener(v -> {
             ubahWarnaFilter(tvDrink);
             etSearch.setText("");
@@ -104,9 +96,16 @@ public class HomeFragment extends Fragment {
     }
 
     private void tampilkanData(List<Kue> list) {
-        // PERBAIKAN 2: Gunakan variabel global 'adapter', jangan buat variabel lokal baru
-        adapter = new KueAdapter(getContext(), list);
-        rvKue.setAdapter(adapter);
+        if (list.isEmpty()) {
+            // Tampilkan empty state
+            rvKue.setVisibility(View.GONE);
+            emptyStateHome.setVisibility(View.VISIBLE);
+        } else {
+            rvKue.setVisibility(View.VISIBLE);
+            emptyStateHome.setVisibility(View.GONE);
+            adapter = new KueAdapter(getContext(), list);
+            rvKue.setAdapter(adapter);
+        }
     }
 
     private void ubahWarnaFilter(TextView tombolAktif) {
@@ -121,12 +120,9 @@ public class HomeFragment extends Fragment {
         tombolAktif.setTypeface(null, android.graphics.Typeface.BOLD);
     }
 
-    // PERBAIKAN 3: Tambahkan onResume untuk merefresh layar saat kembali dari halaman detail
     @Override
     public void onResume() {
         super.onResume();
-        if (adapter != null) {
-            adapter.notifyDataSetChanged(); // Akan menggambar ulang UI dan mengecek status favorit terbaru
-        }
+        if (adapter != null) adapter.notifyDataSetChanged();
     }
 }
