@@ -43,6 +43,10 @@ public class KueAdapter extends RecyclerView.Adapter<KueAdapter.KueViewHolder> {
     public void onBindViewHolder(@NonNull KueViewHolder holder, int position) {
         Kue kue = kueList.get(position);
         holder.tvNama.setText(kue.getNama());
+        TextView tvKategori = holder.itemView.findViewById(R.id.tvKategoriKue);
+        if (tvKategori != null && kue.getKategori() != null) {
+            tvKategori.setText(kue.getKategori());
+        }
         holder.tvHarga.setText(kue.getHarga());
         holder.tvRating.setText("⭐ " + kue.getRating() + " " + kue.getUlasan());
 

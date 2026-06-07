@@ -16,6 +16,7 @@ import java.util.List;
 public class FavoriteFragment extends Fragment {
 
     private RecyclerView rvFavorite;
+    private View emptyStateFavorite;
 
     @Nullable
     @Override
@@ -23,6 +24,8 @@ public class FavoriteFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_favorite, container, false);
 
         rvFavorite = view.findViewById(R.id.rvFavorite);
+        emptyStateFavorite = view.findViewById(R.id.emptyStateFavorite);
+
         rvFavorite.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
         loadFavoriteItems();
@@ -35,14 +38,21 @@ public class FavoriteFragment extends Fragment {
         String currentEmail = sharedPref.getString("userEmail", "");
 
         new Thread(() -> {
-            // Gunakan INNER JOIN dari DAO tadi
             List<Kue> listFavorit = AppDatabase.getInstance(getContext()).favoritDao().getFavoritKueByUser(currentEmail);
 
             if (getActivity() != null) {
                 getActivity().runOnUiThread(() -> {
-                    // Panggil KueAdapter, set isAdmin = false
-                    KueAdapter adapter = new KueAdapter(getContext(), listFavorit, false);
-                    rvFavorite.setAdapter(adapter);
+                    if (listFavorit.isEmpty()) {
+                        // Tampilkan empty state
+                        rvFavorite.setVisibility(View.GONE);
+                        emptyStateFavorite.setVisibility(View.VISIBLE);
+                    } else {
+                        // Tampilkan data
+                        rvFavorite.setVisibility(View.VISIBLE);
+                        emptyStateFavorite.setVisibility(View.GONE);
+                        KueAdapter adapter = new KueAdapter(getContext(), listFavorit, false);
+                        rvFavorite.setAdapter(adapter);
+                    }
                 });
             }
         }).start();

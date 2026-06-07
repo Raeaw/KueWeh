@@ -1,49 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#FFFFFF"
+    android:background="#FFF8F3"
     android:fitsSystemWindows="true">
 
+    <!-- Hero header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#FFFFFF"
-        android:elevation="4dp"
-        android:padding="20dp"
-        android:layout_marginBottom="16dp">
+        android:background="#FF7043"
+        android:orientation="vertical"
+        android:paddingHorizontal="24dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="32dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Profil Saya"
-            android:textColor="#1E1C18"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-    </LinearLayout>
+            android:textColor="#FFCCBC"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.1"
+            android:layout_marginBottom="16dp"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingHorizontal="20dp">
-
+        <!-- Avatar + info -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="40dp">
+            android:gravity="center_vertical">
 
-            <ImageView
-                android:id="@+id/profileImage"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:src="@android:drawable/ic_menu_gallery"
-                android:background="#F5F5F5"
-                android:padding="10dp"/>
+            <!-- Avatar circle -->
+            <FrameLayout
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:background="@drawable/bg_avatar_circle">
+
+                <TextView
+                    android:id="@+id/tvAvatarInitial"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="A"
+                    android:textColor="#FF7043"
+                    android:textSize="28sp"
+                    android:textStyle="bold"/>
+            </FrameLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -56,61 +63,148 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Nama Pengguna"
-                    android:textSize="18sp"
+                    android:textSize="20sp"
                     android:textStyle="bold"
-                    android:textColor="#1E1C18"/>
+                    android:textColor="#FFFFFF"/>
 
                 <TextView
                     android:id="@+id/tvProfileEmail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="email@example.com"
-                    android:textSize="14sp"
-                    android:textColor="#7A7670"/>
+                    android:textSize="13sp"
+                    android:textColor="#FFCCBC"
+                    android:layout_marginTop="3dp"/>
             </LinearLayout>
         </LinearLayout>
+    </LinearLayout>
 
+    <!-- Menu items -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="-16dp"
+        android:background="@drawable/bg_card_rounded"
+        android:elevation="4dp"
+        android:paddingVertical="8dp">
+
+        <!-- Riwayat Pesanan -->
         <LinearLayout
             android:id="@+id/btnRiwayatPesanan"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:paddingHorizontal="20dp"
             android:paddingVertical="16dp"
             android:background="?attr/selectableItemBackground"
             android:clickable="true"
-            android:focusable="true">
+            android:focusable="true"
+            android:gravity="center_vertical">
+
+            <FrameLayout
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_icon_circle_orange">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_pesanan"
+                    app:tint="#FF7043"/>
+            </FrameLayout>
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_marginStart="14dp"
                 android:text="Riwayat Pesanan"
-                android:textColor="#1E1C18"
-                android:textSize="16sp"
+                android:textColor="#1A1A1A"
+                android:textSize="15sp"
                 android:textStyle="bold"/>
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
                 android:src="@android:drawable/ic_media_play"
-                android:rotation="0"
-                app:tint="#757575" />
+                app:tint="#BDBDBD"/>
         </LinearLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#EEEEEE"
-            android:layout_marginBottom="40dp"/>
+            android:background="#F5F0EB"
+            android:layout_marginHorizontal="20dp"/>
+
+        <!-- Favorit -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="16dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical">
+
+            <FrameLayout
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_icon_circle_red">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_favorite_navbar"
+                    app:tint="#E53935"/>
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="14dp"
+                android:text="Favorit Saya"
+                android:textColor="#1A1A1A"
+                android:textSize="15sp"
+                android:textStyle="bold"/>
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@android:drawable/ic_media_play"
+                app:tint="#BDBDBD"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Spacer -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <!-- Logout button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="24dp">
 
         <Button
             android:id="@+id/btnLogout"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:backgroundTint="#FF5252"
+            android:layout_height="52dp"
+            android:backgroundTint="#FFEBEE"
             android:text="Keluar / Logout"
-            android:textColor="#FFFFFF"
+            android:textColor="#E53935"
             android:textStyle="bold"
-            android:textAllCaps="false"/>
+            android:textAllCaps="false"
+            android:textSize="15sp"/>
+    </LinearLayout>
 
-    </LinearLayout> </LinearLayout>
+</LinearLayout>

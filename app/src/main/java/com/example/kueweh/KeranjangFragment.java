@@ -22,6 +22,7 @@ import java.util.Locale;
 public class KeranjangFragment extends Fragment implements KeranjangAdapter.KeranjangListener {
 
     private RecyclerView rvKeranjang;
+    private View emptyStateKeranjang;
     private TextView tvTotalHarga;
     private Button btnCheckout;
     private KeranjangAdapter adapter;
@@ -35,6 +36,7 @@ public class KeranjangFragment extends Fragment implements KeranjangAdapter.Kera
         View view = inflater.inflate(R.layout.fragment_keranjang, container, false);
 
         rvKeranjang = view.findViewById(R.id.rvKeranjang);
+        emptyStateKeranjang = view.findViewById(R.id.emptyStateKeranjang);
         tvTotalHarga = view.findViewById(R.id.tvTotalHargaKeranjang);
         btnCheckout = view.findViewById(R.id.btnCheckout);
 
@@ -47,7 +49,7 @@ public class KeranjangFragment extends Fragment implements KeranjangAdapter.Kera
         loadKeranjang();
 
         btnCheckout.setOnClickListener(v -> {
-            if (keranjangList.isEmpty()) {
+            if (keranjangList == null || keranjangList.isEmpty()) {
                 Toast.makeText(getContext(), "Keranjang kosong!", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -56,10 +58,8 @@ public class KeranjangFragment extends Fragment implements KeranjangAdapter.Kera
                 long batchTimestamp = System.currentTimeMillis();
 
                 for (Keranjang item : keranjangList) {
-
                     int hargaSatuan = Integer.parseInt(item.getHargaKue().replaceAll("[^0-9]", ""));
                     int totalPerItem = hargaSatuan * item.getJumlah();
-
                     String hargaFinal = "Rp " + NumberFormat.getNumberInstance(new Locale("id", "ID")).format(totalPerItem) + " (" + item.getJumlah() + "x)";
 
                     Pesanan pesanan = new Pesanan(currentEmail, item.getNamaKue(), hargaFinal, item.getImageUrl(), batchTimestamp, "Pending");
@@ -70,11 +70,9 @@ public class KeranjangFragment extends Fragment implements KeranjangAdapter.Kera
 
                 getActivity().runOnUiThread(() -> {
                     new AlertDialog.Builder(getContext())
-                            .setTitle("Pembayaran Berhasil")
-                            .setMessage("Terima kasih! Pesanan Anda sedang diproses.")
-                            .setPositiveButton("OK", (dialog, which) -> {
-                                loadKeranjang();
-                            })
+                            .setTitle("Pembayaran Berhasil 🎉")
+                            .setMessage("Terima kasih! Pesanan kamu sedang diproses.")
+                            .setPositiveButton("OK", (dialog, which) -> loadKeranjang())
                             .setCancelable(false)
                             .show();
                 });
@@ -86,9 +84,20 @@ public class KeranjangFragment extends Fragment implements KeranjangAdapter.Kera
 
     private void loadKeranjang() {
         keranjangList = db.keranjangDao().getKeranjangByUser(currentEmail);
-        adapter = new KeranjangAdapter(getContext(), keranjangList, this);
-        rvKeranjang.setAdapter(adapter);
-        hitungTotalHarga();
+
+        if (keranjangList.isEmpty()) {
+            // Tampilkan empty state
+            rvKeranjang.setVisibility(View.GONE);
+            emptyStateKeranjang.setVisibility(View.VISIBLE);
+            tvTotalHarga.setText("Rp 0");
+        } else {
+            // Tampilkan data
+            rvKeranjang.setVisibility(View.VISIBLE);
+            emptyStateKeranjang.setVisibility(View.GONE);
+            adapter = new KeranjangAdapter(getContext(), keranjangList, this);
+            rvKeranjang.setAdapter(adapter);
+            hitungTotalHarga();
+        }
     }
 
     private void hitungTotalHarga() {
@@ -96,11 +105,9 @@ public class KeranjangFragment extends Fragment implements KeranjangAdapter.Kera
         for (Keranjang item : keranjangList) {
             String hargaBersih = item.getHargaKue().replaceAll("[^0-9]", "");
             if (!hargaBersih.isEmpty()) {
-                int hargaAngka = Integer.parseInt(hargaBersih);
-                total += (hargaAngka * item.getJumlah());
+                total += Integer.parseInt(hargaBersih) * item.getJumlah();
             }
         }
-
         NumberFormat formatRupiah = NumberFormat.getNumberInstance(new Locale("id", "ID"));
         tvTotalHarga.setText("Rp " + formatRupiah.format(total));
     }
@@ -108,5 +115,11 @@ public class KeranjangFragment extends Fragment implements KeranjangAdapter.Kera
     @Override
     public void onKeranjangUpdated() {
         hitungTotalHarga();
+        // Cek apakah keranjang jadi kosong setelah update
+        if (keranjangList.isEmpty()) {
+            rvKeranjang.setVisibility(View.GONE);
+            emptyStateKeranjang.setVisibility(View.VISIBLE);
+            tvTotalHarga.setText("Rp 0");
+        }
     }
 }
