@@ -35,22 +35,71 @@
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
-            <!-- Avatar circle -->
-            <FrameLayout
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:background="@drawable/bg_avatar_circle">
+            <!-- Avatar circle — klikable untuk ganti foto -->
+            <LinearLayout
+                android:id="@+id/containerAvatar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless">
+
+                <FrameLayout
+                    android:layout_width="72dp"
+                    android:layout_height="72dp">
+
+                    <!-- Inisial fallback -->
+                    <FrameLayout
+                        android:layout_width="72dp"
+                        android:layout_height="72dp"
+                        android:background="@drawable/bg_avatar_circle">
+
+                        <TextView
+                            android:id="@+id/tvAvatarInitial"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:text="A"
+                            android:textColor="#FF7043"
+                            android:textSize="28sp"
+                            android:textStyle="bold"/>
+                    </FrameLayout>
+
+                    <!-- ImageView untuk foto profil -->
+                    <ImageView
+                        android:id="@+id/imgProfilePicture"
+                        android:layout_width="72dp"
+                        android:layout_height="72dp"
+                        android:scaleType="centerCrop"
+                        android:visibility="gone"/>
+
+                    <!-- Edit icon overlay -->
+                    <FrameLayout
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_gravity="bottom|end"
+                        android:background="#FF7043">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:text="✏"
+                            android:textColor="#FFFFFF"
+                            android:textSize="10sp"/>
+                    </FrameLayout>
+                </FrameLayout>
 
                 <TextView
-                    android:id="@+id/tvAvatarInitial"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="A"
-                    android:textColor="#FF7043"
-                    android:textSize="28sp"
-                    android:textStyle="bold"/>
-            </FrameLayout>
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="4dp"
+                    android:text="Ubah"
+                    android:textColor="#FFCCBC"
+                    android:textSize="10sp"/>
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -79,7 +128,7 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Menu items -->
+    <!-- Menu items card -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -170,6 +219,55 @@
                 android:layout_weight="1"
                 android:layout_marginStart="14dp"
                 android:text="Favorit Saya"
+                android:textColor="#1A1A1A"
+                android:textSize="15sp"
+                android:textStyle="bold"/>
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@android:drawable/ic_media_play"
+                app:tint="#BDBDBD"/>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#F5F0EB"
+            android:layout_marginHorizontal="20dp"/>
+
+        <!-- Ubah Password -->
+        <LinearLayout
+            android:id="@+id/btnUbahPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="16dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical">
+
+            <FrameLayout
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_icon_circle_gray">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:src="@android:drawable/ic_lock_lock"
+                    app:tint="#757575"/>
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="14dp"
+                android:text="Ubah Password"
                 android:textColor="#1A1A1A"
                 android:textSize="15sp"
                 android:textStyle="bold"/>

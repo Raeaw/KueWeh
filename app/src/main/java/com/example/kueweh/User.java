@@ -10,11 +10,13 @@ public class User {
 
     public String namaLengkap;
     public String email;
-    public String passwordHash; // Yang disimpan adalah hasil hash, bukan password asli
+    public String passwordHash;
+    public String profileImageUrl; // Foto profil pengguna (URI string)
 
     public User(String namaLengkap, String email, String passwordHash) {
         this.namaLengkap = namaLengkap;
         this.email = email;
         this.passwordHash = passwordHash;
+        this.profileImageUrl = "";
     }
 }
