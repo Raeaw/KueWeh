@@ -4,8 +4,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="6dp"
-    app:cardCornerRadius="20dp"
+    android:layout_marginHorizontal="6dp"
+    android:layout_marginBottom="12dp"
+    android:layout_marginTop="4dp"
+    app:cardCornerRadius="18dp"
     app:cardElevation="3dp"
     app:cardBackgroundColor="#FFFFFF">
 
@@ -14,10 +16,9 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Image + Favorite button -->
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="150dp">
+            android:layout_height="148dp">
 
             <ImageView
                 android:id="@+id/imgKue"
@@ -26,29 +27,22 @@
                 android:scaleType="centerCrop"
                 android:background="#F5F0EB"/>
 
-            <!-- Gradient overlay bawah -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_gravity="bottom"
-                android:background="@drawable/gradient_bottom_overlay"/>
-
-            <!-- Kategori badge -->
+            <!-- Badge kategori kiri atas -->
             <TextView
                 android:id="@+id/tvKategoriKue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|start"
                 android:layout_margin="10dp"
-                android:background="@drawable/bg_badge_kategori"
+                android:background="@drawable/bg_chip_active"
                 android:paddingHorizontal="8dp"
-                android:paddingVertical="3dp"
+                android:paddingVertical="4dp"
                 android:text="Cake"
                 android:textColor="#FFFFFF"
-                android:textSize="9sp"
+                android:textSize="10sp"
                 android:textStyle="bold"/>
 
-            <!-- Favorite button -->
+            <!-- Tombol favorit kanan atas -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/btnFavoriteLayout"
                 android:layout_width="34dp"
@@ -57,7 +51,7 @@
                 android:layout_margin="10dp"
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="17dp"
-                app:cardElevation="4dp">
+                app:cardElevation="3dp">
 
                 <ImageView
                     android:id="@+id/imgFavoriteHeart"
@@ -69,7 +63,6 @@
             </androidx.cardview.widget.CardView>
         </FrameLayout>
 
-        <!-- Info -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -91,30 +84,40 @@
                 android:textStyle="bold"
                 android:lineSpacingMultiplier="1.1"/>
 
-            <!-- Rating row -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginTop="6dp">
+                android:layout_marginTop="8dp">
 
+                <!-- Bintang kuning statis -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="★"
+                    android:textColor="#FFA000"
+                    android:textSize="12sp"/>
+
+                <!-- Angka rating + jumlah ulasan -->
                 <TextView
                     android:id="@+id/tvRating"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="⭐ 0.0"
+                    android:layout_marginStart="3dp"
+                    android:text="0.0 (0)"
                     android:textSize="11sp"
                     android:textColor="#9E9E9E"/>
 
+                <!-- Harga -->
                 <TextView
                     android:id="@+id/tvHargaKue"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Rp 0"
                     android:textColor="#FF7043"
-                    android:textSize="13sp"
+                    android:textSize="12sp"
                     android:textStyle="bold"/>
             </LinearLayout>
         </LinearLayout>

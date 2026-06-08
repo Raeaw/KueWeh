@@ -48,7 +48,7 @@ public class KueAdapter extends RecyclerView.Adapter<KueAdapter.KueViewHolder> {
             tvKategori.setText(kue.getKategori());
         }
         holder.tvHarga.setText(kue.getHarga());
-        holder.tvRating.setText("⭐ " + kue.getRating() + " " + kue.getUlasan());
+        holder.tvRating.setText(kue.getRating() + " " + kue.getUlasan());
 
         Glide.with(context).load(kue.getImageUrl()).into(holder.imgKue);
 
