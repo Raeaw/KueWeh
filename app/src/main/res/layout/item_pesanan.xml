@@ -3,19 +3,19 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:background="#FFFFFF"
-    android:padding="12dp"
-    android:gravity="center_vertical">
+    android:gravity="center_vertical"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="10dp">
 
-    <!-- Gambar produk -->
+    <!-- Gambar Produk -->
     <ImageView
         android:id="@+id/imgPesanan"
         android:layout_width="72dp"
         android:layout_height="72dp"
-        android:scaleType="centerCrop"
-        android:background="@drawable/bg_image_rounded"/>
+        android:background="@drawable/bg_image_rounded"
+        android:scaleType="centerCrop"/>
 
-    <!-- Info tengah -->
+    <!-- Info Produk -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -28,87 +28,87 @@
             android:id="@+id/tvNamaPesanan"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Nama Produk"
-            android:textColor="#1E1C18"
+            android:text="Nama Kue"
+            android:textColor="#1A1A1A"
             android:textSize="14sp"
-            android:textStyle="bold"
-            android:maxLines="2"
-            android:ellipsize="end"
-            android:lineSpacingExtra="2dp"/>
-
-        <TextView
-            android:id="@+id/tvHargaPesanan"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Rp 0"
-            android:textColor="#FF7043"
-            android:textSize="13sp"
             android:textStyle="bold"
             android:maxLines="2"
             android:ellipsize="end"/>
 
-        <!-- Rating item (hanya di riwayat pelanggan) -->
         <TextView
-            android:id="@+id/tvRatingItem"
+            android:id="@+id/tvHargaPesanan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="⭐ Rating"
-            android:textColor="#1E1C18"
-            android:textSize="12sp"
-            android:background="@drawable/bg_chip_inactive"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="2dp"/>
-    </LinearLayout>
-
-    <!-- Kanan: badge status + kontrol admin -->
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="end|center_vertical">
-
-        <!-- Badge status pelanggan -->
-        <TextView
-            android:id="@+id/tvStatusPesananBadge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Pending"
-            android:textSize="11sp"
+            android:text="Rp 0"
+            android:textColor="#FF7043"
+            android:textSize="13sp"
             android:textStyle="bold"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="4dp"
-            android:background="@drawable/bg_chip_inactive"
-            android:visibility="visible"/>
+            android:layout_marginTop="4dp"/>
 
-        <!-- Kontrol admin (tombol aksi per item) -->
+        <!-- Rating & Status Row -->
         <LinearLayout
-            android:id="@+id/layoutAdminItemControl"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="end"
-            android:visibility="gone">
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="6dp">
 
+            <!-- Badge Status (untuk pelanggan) -->
             <TextView
-                android:id="@+id/tvAdminItemStatus"
+                android:id="@+id/tvStatusPesananBadge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Pending"
                 android:textSize="11sp"
                 android:textStyle="bold"
-                android:layout_marginBottom="4dp"/>
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="3dp"
+                android:background="@drawable/bg_chip_inactive"
+                android:layout_marginEnd="8dp"/>
+
+            <!-- Rating Button -->
+            <TextView
+                android:id="@+id/tvRatingItem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⭐ Rating"
+                android:textColor="#BDBDBD"
+                android:textSize="11sp"
+                android:background="@drawable/bg_chip_inactive"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="3dp"/>
+        </LinearLayout>
+
+        <!-- Panel Admin (tersembunyi secara default) -->
+        <LinearLayout
+            android:id="@+id/layoutAdminItemControl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="6dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tvAdminItemStatus"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Pending"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="#FF9800"/>
 
             <Button
                 android:id="@+id/btnAdminItemAksi"
-                android:layout_width="wrap_content"
+                android:layout_width="80dp"
                 android:layout_height="32dp"
                 android:text="Terima"
                 android:textSize="11sp"
+                android:textColor="#FFFFFF"
                 android:textAllCaps="false"
-                android:paddingHorizontal="10dp"/>
+                android:backgroundTint="#2196F3"
+                android:padding="0dp"/>
         </LinearLayout>
     </LinearLayout>
-
 </LinearLayout>
