@@ -12,6 +12,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -45,6 +47,20 @@ public class KeranjangFragment extends Fragment implements KeranjangAdapter.Kera
 
         SharedPreferences sharedPref = getActivity().getSharedPreferences("KueWehSession", Context.MODE_PRIVATE);
         currentEmail = sharedPref.getString("userEmail", "");
+
+        // Handle status bar padding hanya pada header, bukan seluruh fragment
+        View header = view.findViewById(R.id.tvHeaderKeranjang);
+        ViewCompat.setOnApplyWindowInsetsListener(header, (v, insets) -> {
+            int statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
+            int padding18dp = (int) (18 * getResources().getDisplayMetrics().density);
+            v.setPadding(
+                    v.getPaddingLeft(),
+                    statusBarHeight + padding18dp,
+                    v.getPaddingRight(),
+                    padding18dp
+            );
+            return insets;
+        });
 
         loadKeranjang();
 
@@ -86,12 +102,10 @@ public class KeranjangFragment extends Fragment implements KeranjangAdapter.Kera
         keranjangList = db.keranjangDao().getKeranjangByUser(currentEmail);
 
         if (keranjangList.isEmpty()) {
-            // Tampilkan empty state
             rvKeranjang.setVisibility(View.GONE);
             emptyStateKeranjang.setVisibility(View.VISIBLE);
             tvTotalHarga.setText("Rp 0");
         } else {
-            // Tampilkan data
             rvKeranjang.setVisibility(View.VISIBLE);
             emptyStateKeranjang.setVisibility(View.GONE);
             adapter = new KeranjangAdapter(getContext(), keranjangList, this);
@@ -115,7 +129,6 @@ public class KeranjangFragment extends Fragment implements KeranjangAdapter.Kera
     @Override
     public void onKeranjangUpdated() {
         hitungTotalHarga();
-        // Cek apakah keranjang jadi kosong setelah update
         if (keranjangList.isEmpty()) {
             rvKeranjang.setVisibility(View.GONE);
             emptyStateKeranjang.setVisibility(View.VISIBLE);

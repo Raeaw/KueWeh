@@ -17,25 +17,23 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="20dp"
         android:paddingVertical="18dp"
-        android:fitsSystemWindows="true"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:src="@drawable/ic_pesanan"
+            android:layout_marginEnd="12dp"/>
+
         <TextView
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:text="Keranjang Belanja"
             android:textColor="#1A1A1A"
             android:textSize="20sp"
             android:textStyle="bold"/>
-
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_pesanan"
-            android:alpha="0.5"/>
     </LinearLayout>
 
     <!-- RecyclerView -->
@@ -53,7 +51,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Empty State Keranjang -->
+    <!-- Empty State -->
     <LinearLayout
         android:id="@+id/emptyStateKeranjang"
         android:layout_width="0dp"
@@ -95,13 +93,13 @@
 
     </LinearLayout>
 
-    <!-- Bottom bar -->
+    <!-- Bottom Bar -->
     <LinearLayout
         android:id="@+id/bottomKeranjangBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="#FFFFFF"
-        android:elevation="12dp"
+        android:elevation="4dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="20dp"
