@@ -101,7 +101,7 @@ public class DetailActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> finish());
 
         // Aksi Tambah ke Keranjang
-        btnPesan.setText("Tambah ke Keranjang");
+//        btnPesan.setText("Tambah ke Keranjang");
         btnPesan.setOnClickListener(v -> {
             new Thread(() -> {
                 Kue kue = kueDao.getKueById(kueId);
